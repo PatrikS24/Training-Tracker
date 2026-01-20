@@ -10,7 +10,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.trainingtracker.ExercisesScreen
 import com.example.trainingtracker.HomeScreen
 import com.example.trainingtracker.StatisticsScreen
 

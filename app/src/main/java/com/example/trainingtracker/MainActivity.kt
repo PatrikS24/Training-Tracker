@@ -49,10 +49,6 @@ fun MainScreen() {
 {
     Text("Home Screen")
 }
-@Composable fun ExercisesScreen()
-{
-    Text("Exercises Screen")
-}
 @Composable fun StatisticsScreen()
 {
     Text("Statistics Screen")
