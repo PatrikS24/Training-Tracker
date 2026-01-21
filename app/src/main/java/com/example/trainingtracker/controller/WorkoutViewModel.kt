@@ -8,33 +8,63 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trainingtracker.model.Workout
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class WorkoutViewModel(application: Application) :
     AndroidViewModel(application) {
-    var workoutActive: Boolean by mutableStateOf(false)
-    var activeWorkout: Workout? = null
+    var activeWorkout: Workout? by mutableStateOf(null)
 
     private val dao = DatabaseProvider
         .getDatabase(application)
         .workoutDao()
 
     fun getActiveWorkout() {
-        // todo: get active workout from db
         viewModelScope.launch {
             var active = dao.getActive()
-            if (!active.isEmpty()) {
+            if (!active.isEmpty() && (active[0] != null)) {
                 activeWorkout = Workout(active[0].id, active[0].name)
                 activeWorkout?.startTime = active[0].startTime
                 activeWorkout?.updateDuration()
+                activeWorkout?.completed = active[0].completed
             }
         }
     }
 
     fun createWorkout() {
-
+        var newWorkout = WorkoutDB(
+            name = "workout", completed = false,
+            id = 0,
+            startTime = Date(),
+            durationMinutes = 0
+        )
+        viewModelScope.launch {
+            dao.insert(newWorkout)
+            getActiveWorkout()
+        }
     }
 
-    fun swapActiveState() {
-        workoutActive = !workoutActive
+    fun updateDatabase() {
+        viewModelScope.launch {
+            val a = activeWorkout
+            if (a != null) {
+                var updatedWorkoutDB = WorkoutDB(
+                    id = a.id,
+                    name = a.name,
+                    startTime = a.startTime,
+                    durationMinutes = a.durationMinutes,
+                    completed = a.completed
+                )
+                dao.updateWorkout(updatedWorkoutDB)
+            }
+
+        }
+    }
+
+    fun deleteAllWorkouts() {
+        viewModelScope.launch {
+            dao.deleteAll()
+            getActiveWorkout()
+            activeWorkout = null
+        }
     }
 }

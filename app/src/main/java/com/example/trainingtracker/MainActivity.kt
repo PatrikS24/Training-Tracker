@@ -54,7 +54,7 @@ fun MainScreen() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text("Work in progress")
+        Text("Coming soon...")
     }
 
 }

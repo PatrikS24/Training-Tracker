@@ -14,6 +14,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import androidx.room.Update
 import java.util.Date
 
 @Entity(
@@ -72,8 +73,14 @@ interface WorkoutDao {
     @Query("DELETE FROM workouts WHERE id = :id")
     suspend fun deleteById(id: Int)
 
+    @Update
+    suspend fun updateWorkout(workout: WorkoutDB)
+
     @Query("UPDATE workouts SET name = :name WHERE id = :id")
     suspend fun updateName(id: Int, name: String)
+
+    @Query("DELETE FROM workouts")    // todo: REMOVE
+    suspend fun deleteAll()
 }
 
 @Entity(

@@ -19,7 +19,7 @@ fun WorkoutScreen( viewModel: WorkoutViewModel = viewModel() )
 {
     viewModel.getActiveWorkout()
 
-    when (viewModel.workoutActive) {
+    when (val active = viewModel.activeWorkout != null) {
         false -> {
             NoActiveWorkout(viewModel)
         }
@@ -35,8 +35,7 @@ fun NoActiveWorkout(viewModel: WorkoutViewModel = viewModel()) {
     Column (modifier = Modifier.fillMaxSize().padding(16.dp)){
         Spacer(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.5f))
         Button(onClick = {
-            // todo: create new workout
-            viewModel.swapActiveState()
+            viewModel.createWorkout()
         },
             modifier = Modifier.fillMaxWidth())
         {
@@ -48,5 +47,15 @@ fun NoActiveWorkout(viewModel: WorkoutViewModel = viewModel()) {
 
 @Composable
 fun ActiveWorkout(viewModel: WorkoutViewModel = viewModel()) {
+    Column (modifier = Modifier.fillMaxSize().padding(16.dp)){
+        viewModel.activeWorkout?.name?.let { Text(it ) }
 
+
+
+        Button(onClick = {
+            viewModel.deleteAllWorkouts()
+        }) {
+            Text("Delete workout table")
+        }
+    }
 }
