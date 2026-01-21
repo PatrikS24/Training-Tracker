@@ -19,10 +19,10 @@ sealed class BottomNavItem(
 ) {
     object Home : BottomNavItem("home", "Home")
     object Exercises : BottomNavItem("exercises", "Exercises")
-    object Profile : BottomNavItem("profile", "Profile")
+    object Statistics : BottomNavItem("statistics", "Statistics")
 
     companion object {
-        val items = listOf(Home, Exercises, Profile)
+        val items = listOf(Home, Exercises, Statistics)
     }
 }
 
@@ -35,7 +35,7 @@ fun AppNavHost(navController: NavHostController) {
     ) {
         composable("home") { HomeScreen() }
         composable("exercises") { ExercisesScreen() }
-        composable("profile") { StatisticsScreen() }
+        composable("statistics") { StatisticsScreen() }
     }
 }
 
