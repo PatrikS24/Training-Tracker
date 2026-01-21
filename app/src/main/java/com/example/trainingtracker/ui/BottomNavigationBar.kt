@@ -10,19 +10,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.trainingtracker.HomeScreen
 import com.example.trainingtracker.StatisticsScreen
 
 sealed class BottomNavItem(
     val route: String,
     val label: String
 ) {
-    object Home : BottomNavItem("home", "Home")
+    object Workout : BottomNavItem("workout", "Workout")
     object Exercises : BottomNavItem("exercises", "Exercises")
     object Statistics : BottomNavItem("statistics", "Statistics")
 
     companion object {
-        val items = listOf(Home, Exercises, Statistics)
+        val items = listOf(Workout, Exercises, Statistics)
     }
 }
 
@@ -31,9 +30,9 @@ fun AppNavHost(navController: NavHostController) {
 
     NavHost(
         navController = navController,
-        startDestination = BottomNavItem.Home.route
+        startDestination = BottomNavItem.Workout.route
     ) {
-        composable("home") { HomeScreen() }
+        composable("Workout") { WorkoutScreen() }
         composable("exercises") { ExercisesScreen() }
         composable("statistics") { StatisticsScreen() }
     }

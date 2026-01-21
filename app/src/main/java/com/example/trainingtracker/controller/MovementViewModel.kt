@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.trainingtracker.model.Movement
 import kotlinx.coroutines.launch
 
@@ -27,7 +26,6 @@ class MovementViewModel(application: Application) :
             dao.updateName(movement.id, newName)
             refreshMovements()
         }
-
     }
 
     fun refreshMovements() {
@@ -44,6 +42,7 @@ class MovementViewModel(application: Application) :
                     )
                 }
             )
+            movements.sortBy { it.name.lowercase() }
         }
 
     }
