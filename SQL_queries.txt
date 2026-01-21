@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS workout(
 );
 
 -- create movement table
-CREATE TABLE IF NOT EXISTS movement(
+CREATE TABLE IF NOT EXISTS movements(
     movementID INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE
 );

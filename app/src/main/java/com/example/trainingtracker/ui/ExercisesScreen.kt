@@ -35,27 +35,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.trainingtracker.controller.MovementController
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.trainingtracker.controller.MovementViewModel
 import com.example.trainingtracker.model.Movement
 
 @Composable
-fun ExercisesScreen()
+fun ExercisesScreen( viewModel: MovementViewModel = viewModel() )
 {
     // todo: get data from db
     Box (modifier = Modifier.fillMaxSize()){
         LazyColumn {
-            items(MovementController.movements) { movement ->
-                MovementCard(movement)
+            items(viewModel.movements) { movement ->
+                MovementCard(viewModel, movement)
             }
         }
-        NewMovementButton(modifier = Modifier.align(Alignment.BottomStart))
+        NewMovementButton(viewModel = viewModel, modifier = Modifier.align(Alignment.BottomStart))
     }
 
 
 }
 
 @Composable
-fun NewMovementButton(modifier: Modifier = Modifier) {
+fun NewMovementButton(viewModel: MovementViewModel = viewModel(), modifier: Modifier = Modifier) {
     var dialogData by remember { mutableStateOf(DialogData(-1, false)) }
 
     FloatingActionButton(
@@ -70,6 +71,7 @@ fun NewMovementButton(modifier: Modifier = Modifier) {
     }
     if (dialogData.showDialog) {
         NewMovementDialog(
+            viewModel = viewModel,
             dialogData = dialogData,
             updateShowAddDialog = { newData ->
                 dialogData = newData
@@ -80,6 +82,7 @@ fun NewMovementButton(modifier: Modifier = Modifier) {
 
 @Composable
 fun NewMovementDialog(
+    viewModel: MovementViewModel = viewModel(),
     updateShowAddDialog: (DialogData) -> Unit,
     dialogData: DialogData
 ) {
@@ -131,7 +134,7 @@ fun NewMovementDialog(
                     Spacer(modifier = Modifier.weight(1f))
                     Button(onClick = {
                         updateShowAddDialog(dialogData.copy(showDialog = false))
-                        MovementController.addMovement(exerciseName)
+                        viewModel.addMovement(exerciseName)
                     }) {
                         Text("Add")
                     }
@@ -142,7 +145,7 @@ fun NewMovementDialog(
 }
 
 @Composable
-fun MovementCard(movement : Movement) {
+fun MovementCard(viewModel: MovementViewModel = viewModel(), movement : Movement) {
     var dialogData by remember { mutableStateOf(DialogData(1, false)) }
 
     Card(
@@ -167,6 +170,7 @@ fun MovementCard(movement : Movement) {
         }
         if (dialogData.showDialog) {
             editMovementDialog(
+                viewModel,
                 dialogData = dialogData,
                 movement,
                 updateDialogData = { newData ->
@@ -178,8 +182,10 @@ fun MovementCard(movement : Movement) {
 }
 
 @Composable
-fun editMovementDialog(dialogData: DialogData, movement: Movement,
-                       updateDialogData: (DialogData) -> Unit ) {
+fun editMovementDialog(
+    viewModel: MovementViewModel = viewModel(),
+    dialogData: DialogData, movement: Movement,
+    updateDialogData: (DialogData) -> Unit ) {
 
     Dialog(
         onDismissRequest = { updateDialogData(dialogData.copy(showDialog = false)) }, // Dismiss when clicking outside
@@ -195,10 +201,10 @@ fun editMovementDialog(dialogData: DialogData, movement: Movement,
             shape = RoundedCornerShape(16.dp),
         ) {
             when (dialogData.state) {
-                1 -> EditMovementState(dialogData, movement) { newData ->
+                1 -> EditMovementState(viewModel, dialogData, movement) { newData ->
                     updateDialogData(newData) // Pass the update back up
                 }
-                2 -> DeleteMovementState(dialogData, movement) { newData ->
+                2 -> DeleteMovementState(viewModel, dialogData, movement) { newData ->
                     updateDialogData(newData) // Pass the update back up
                 }
             }
@@ -207,8 +213,10 @@ fun editMovementDialog(dialogData: DialogData, movement: Movement,
 }
 
 @Composable
-fun EditMovementState(dialogData: DialogData, movement: Movement,
-                      updateDialogData: (DialogData) -> Unit) {
+fun EditMovementState(
+    viewModel: MovementViewModel = viewModel(),
+    dialogData: DialogData, movement: Movement,
+    updateDialogData: (DialogData) -> Unit) {
     var exerciseName by remember { mutableStateOf("")}
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -253,6 +261,7 @@ fun EditMovementState(dialogData: DialogData, movement: Movement,
             Button(onClick = {
                 updateDialogData(dialogData.copy(showDialog = false))
                 // Todo: update database with new name
+                viewModel.renameMovement(movement, exerciseName);
             }) {
                 Text("Confirm")
             }
@@ -261,8 +270,10 @@ fun EditMovementState(dialogData: DialogData, movement: Movement,
 }
 
 @Composable
-fun DeleteMovementState(dialogData : DialogData, movement: Movement,
-                        updateDialogData: (DialogData) -> Unit) {
+fun DeleteMovementState(
+    viewModel: MovementViewModel = viewModel(),
+    dialogData : DialogData, movement: Movement,
+    updateDialogData: (DialogData) -> Unit) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
             text = "Are you sure you want to delete this exercise? All saved data will be deleted.",
@@ -284,7 +295,7 @@ fun DeleteMovementState(dialogData : DialogData, movement: Movement,
             Spacer(modifier = Modifier.weight(1f))
             Button(onClick = {
                 updateDialogData(dialogData.copy(state = 1, showDialog = false))
-                MovementController.removeMovement(movement);
+                viewModel.removeMovement(movement);
                 // Todo: delete from database
             },
                 colors = ButtonDefaults.buttonColors(Color.Red, Color.White)
