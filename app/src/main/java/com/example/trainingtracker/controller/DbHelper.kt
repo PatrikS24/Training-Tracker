@@ -42,6 +42,9 @@ interface MovementDao {
     @Query("UPDATE OR IGNORE movements SET name = :name WHERE id = :id")
     suspend fun updateName(id: Int, name: String)
 
+    @Query("SELECT * FROM movements WHERE id = :id LIMIT 1")
+    suspend fun getMovementById(id: Int?) : MovementDB
+
 }
 
 @Entity(
@@ -103,11 +106,10 @@ interface WorkoutDao {
 data class ExerciseDB(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val movementId: Int,
+    val movementId: Int?,
     val workoutId: Int,
     val orderIndex: Int,
-    val notes: String,
-    val completed: Boolean
+    val notes: String
 )
 
 
@@ -117,10 +119,13 @@ interface ExerciseDao {
     suspend fun getAllExercises(): List<ExerciseDB>
 
     @Insert
-    suspend fun insert(exerciseDB: ExerciseDB)
+    suspend fun insert(exerciseDB: ExerciseDB): Long
 
     @Query("DELETE FROM exercises WHERE id = :id")
     suspend fun deleteById(id: Int)
+
+    @Query("SELECT * FROM exercises WHERE workoutId = :id")
+    suspend fun getAllExercisesById(id: Int) : List<ExerciseDB>
 }
 
 @Entity(
@@ -170,7 +175,7 @@ interface ExerciseSetDao {
                 WorkoutDB::class,
                 ExerciseDB::class,
                 ExerciseSetDB::class],
-    version = 2,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
