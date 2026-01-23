@@ -49,7 +49,7 @@ class WorkoutViewModel(application: Application) :
                 activeWorkout.startTime = active[0].startTime
                 activeWorkout.updateDuration()
                 activeWorkout.completed = active[0].completed
-                updateExercises()
+                getExercisesForWorkout()
                 state = WorkoutScreenState.active
             } else {
                 state = WorkoutScreenState.inactive
@@ -113,7 +113,14 @@ class WorkoutViewModel(application: Application) :
         }
     }
 
-    fun updateExercises() {
+    fun deleteExercise(exercise: Exercise) {
+        viewModelScope.launch {
+            exerciseDao.deleteById(exercise.id)
+            activeWorkout.exercises.remove(exercise)
+        }
+    }
+
+    fun getExercisesForWorkout() {
         if (hasActiveWorkout()) {
             activeWorkout.exercises.clear()
             viewModelScope.launch {
