@@ -126,6 +126,9 @@ interface ExerciseDao {
 
     @Query("SELECT * FROM exercises WHERE workoutId = :id")
     suspend fun getAllExercisesById(id: Int) : List<ExerciseDB>
+
+    @Update
+    suspend fun updateExercise(exerciseDB: ExerciseDB)
 }
 
 @Entity(

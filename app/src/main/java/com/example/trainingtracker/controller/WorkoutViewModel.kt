@@ -5,7 +5,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trainingtracker.model.Exercise
@@ -132,6 +131,19 @@ class WorkoutViewModel(application: Application) :
                     // Todo: get sets and create sets objects and add them to exercise object list variable
                     activeWorkout.exercises.add(exercise)
                 }
+            }
+        }
+    }
+
+    fun updateExercise(exercise: Exercise?) {
+        if (exercise != null) {
+            viewModelScope.launch {
+                val dbExercise = ExerciseDB(id = exercise.id,
+                    movementId = exercise.movement?.id,
+                    workoutId = activeWorkout.id,
+                    orderIndex = exercise.orderIndex,
+                    notes = exercise.notes)
+                exerciseDao.updateExercise(dbExercise)
             }
         }
     }

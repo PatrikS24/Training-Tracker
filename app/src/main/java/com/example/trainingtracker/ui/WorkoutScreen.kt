@@ -1,15 +1,8 @@
 package com.example.trainingtracker.ui
 
-import android.graphics.Paint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.FlingBehavior
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.ScrollableState
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,46 +11,34 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.semantics.isTraversalGroup
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.trainingtracker.controller.WorkoutScreenState
 import com.example.trainingtracker.controller.WorkoutViewModel
 import com.example.trainingtracker.model.Exercise
+import com.example.trainingtracker.model.Movement
 
 @Composable
 fun WorkoutScreen( viewModel: WorkoutViewModel = viewModel() )
@@ -66,10 +47,17 @@ fun WorkoutScreen( viewModel: WorkoutViewModel = viewModel() )
         viewModel.getActiveWorkout()
     }
 
+    var initialSearchQuery by remember { mutableStateOf<Exercise?>(null) }
+
     when (viewModel.state) {
         WorkoutScreenState.inactive -> NoActiveWorkout(viewModel)
-        WorkoutScreenState.active -> ActiveWorkout(viewModel)
-        WorkoutScreenState.search -> FullScreenSearchBar(viewModel)
+        WorkoutScreenState.active -> ActiveWorkout(viewModel, onSearchTriggered = { dataFromHome ->
+            initialSearchQuery = dataFromHome})
+        WorkoutScreenState.search -> FullScreenSearchBar(viewModel, initialSearchQuery,
+            onDismiss = {
+                viewModel.state = WorkoutScreenState.active
+                
+        })
     }
 }
 
@@ -90,7 +78,7 @@ fun NoActiveWorkout(viewModel: WorkoutViewModel = viewModel()) {
 }
 
 @Composable
-fun ActiveWorkout(viewModel: WorkoutViewModel = viewModel()) {
+fun ActiveWorkout(viewModel: WorkoutViewModel = viewModel(), onSearchTriggered: (Exercise?) -> Unit) {
     Column (
         modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally){
@@ -99,7 +87,8 @@ fun ActiveWorkout(viewModel: WorkoutViewModel = viewModel()) {
 
         LazyColumn (modifier = Modifier.weight(1f)){
             items(viewModel.activeWorkout.exercises) { exercise ->
-                ExerciseCard(viewModel, exercise)
+                ExerciseCard(viewModel, exercise, onSearchTriggered = { dataFromHome ->
+                    onSearchTriggered(dataFromHome)})
             }
             item {
                 Column(
@@ -130,7 +119,7 @@ fun ActiveWorkout(viewModel: WorkoutViewModel = viewModel()) {
 }
 
 @Composable
-fun ExerciseCard( viewModel: WorkoutViewModel = viewModel(), exercise: Exercise ) {
+fun ExerciseCard( viewModel: WorkoutViewModel = viewModel(), exercise: Exercise, onSearchTriggered: (Exercise?) -> Unit ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -141,10 +130,13 @@ fun ExerciseCard( viewModel: WorkoutViewModel = viewModel(), exercise: Exercise 
             horizontalAlignment = Alignment.End) {
             exercise.movement?.name?.let { Text(text = it, style = MaterialTheme.typography.titleLarge) }
 
-            Button(onClick = {
-                viewModel.state = WorkoutScreenState.search
-            }) {
-                Text("Add movement")
+            if (exercise.movement == null) {
+                Button(onClick = {
+                    viewModel.state = WorkoutScreenState.search
+                    onSearchTriggered(exercise)
+                }) {
+                    Text("Choose movement")
+                }
             }
 
         }
@@ -194,9 +186,15 @@ fun SearchScreen( viewModel: WorkoutViewModel = viewModel() ) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FullScreenSearchBar( viewModel: WorkoutViewModel = viewModel() ) {
+fun FullScreenSearchBar(viewModel: WorkoutViewModel = viewModel(), exercise: Exercise?, onDismiss: () -> Unit) {
     var query by remember { mutableStateOf("") }
-    var active by remember { mutableStateOf(false) }
+    var active by remember { mutableStateOf(true) }
+
+    BackHandler(enabled = true) {
+        // Choose your logic here:
+        onDismiss()
+    }
+
     viewModel.getAllMovements()
 
     SearchBar(
@@ -222,7 +220,8 @@ fun FullScreenSearchBar( viewModel: WorkoutViewModel = viewModel() ) {
                             .padding(16.dp)
                             .clickable {
                                 /* Handle selection */
-
+                                exercise?.movement = Movement(result.id, result.name)
+                                viewModel.updateExercise(exercise)
                                 active = false
                                 viewModel.state = WorkoutScreenState.active
                             }
