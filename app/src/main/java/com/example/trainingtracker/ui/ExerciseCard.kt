@@ -96,7 +96,7 @@ fun ExerciseCardOptionsMenu( viewModel: WorkoutViewModel = viewModel(), exercise
                 text = { Text("Change movement") },
                 onClick = {
                     expanded = false
-                    viewModel.state = WorkoutScreenState.search
+                    viewModel.setScreenState( WorkoutScreenState.search )
                     onSearchTriggered(exercise)
                 }
             )

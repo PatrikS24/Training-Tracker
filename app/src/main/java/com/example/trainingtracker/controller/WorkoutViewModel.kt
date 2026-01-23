@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trainingtracker.model.Exercise
+import com.example.trainingtracker.model.ExerciseSet
 import com.example.trainingtracker.model.Movement
 import com.example.trainingtracker.model.Workout
 import kotlinx.coroutines.launch
@@ -33,6 +34,10 @@ class WorkoutViewModel(application: Application) :
     private val movementDao = DatabaseProvider
         .getDatabase(application)
         .movementDao()
+
+    private val exerciseSetDao = DatabaseProvider
+        .getDatabase(application)
+        .exerciseSetDao()
 
 
     fun hasActiveWorkout(): Boolean {
@@ -135,7 +140,9 @@ class WorkoutViewModel(application: Application) :
                     }
                     exercise.orderIndex = dbExercise.orderIndex
                     exercise.notes = dbExercise.notes
-                    // Todo: get sets and create sets objects and add them to exercise object list variable
+
+                    getSetsForExercise(exercise)
+
                     activeWorkout.exercises.add(exercise)
                 }
             }
@@ -166,6 +173,42 @@ class WorkoutViewModel(application: Application) :
             movements.clear()
             movements.addAll(dbMovements)
             movements.sortBy { it.name.lowercase() }
+        }
+    }
+
+    fun createSet(exercise: Exercise) {
+        viewModelScope.launch {
+            var setDb = ExerciseSetDB(
+                id = 0,
+                exerciseId = exercise.id,
+                orderIndex = exercise.sets.size
+            )
+            var id = exerciseSetDao.insert(setDb)
+            var set = ExerciseSet(
+                id = id.toInt()
+            )
+            set.orderIndex = exercise.sets.size
+            exercise.sets.add(set)
+        }
+    }
+
+    suspend fun getSetsForExercise(exercise: Exercise) {
+        if (hasActiveWorkout()) {
+            exercise.sets.clear()
+            //viewModelScope.launch {
+                val dbSets = exerciseSetDao.getAllExerciseSetsById(exercise.id)
+                for (dbSet in dbSets) {
+                    var set = ExerciseSet(id = dbSet.id)
+
+                    set.weight = dbSet.weight
+                    set.reps = dbSet.reps
+                    set.orderIndex = dbSet.orderIndex
+                    set.isWarmup = dbSet.isWarmup
+                    set.completed = dbSet.completed
+
+                    exercise.sets.add(set)
+                }
+            //}
         }
     }
 }

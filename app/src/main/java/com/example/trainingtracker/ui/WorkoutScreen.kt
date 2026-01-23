@@ -71,7 +71,7 @@ fun WorkoutScreen( viewModel: WorkoutViewModel = viewModel() )
         }
         WorkoutScreenState.search -> SearchScreen(viewModel, initialSearchQuery,
             onDismiss = {
-                viewModel.state = WorkoutScreenState.active
+                viewModel.setScreenState( WorkoutScreenState.active )
 
         })
     }
@@ -248,7 +248,7 @@ fun SearchScreen(viewModel: WorkoutViewModel = viewModel(), exercise: Exercise?,
                                 exercise?.movement = Movement(result.id, result.name)
                                 viewModel.updateExercise(exercise)
                                 active = false
-                                viewModel.state = WorkoutScreenState.active
+                                viewModel.setScreenState( WorkoutScreenState.active )
                             }
                     )
                 }

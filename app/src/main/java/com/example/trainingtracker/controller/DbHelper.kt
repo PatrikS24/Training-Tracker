@@ -156,10 +156,13 @@ data class ExerciseSetDB(
 @Dao
 interface ExerciseSetDao {
     @Query("SELECT * FROM exercise_sets")
-    suspend fun getAllWorkouts(): List<ExerciseSetDB>
+    suspend fun getAllExerciseSets(): List<ExerciseSetDB>
+
+    @Query("SELECT * FROM exercise_sets WHERE exerciseId = :id")
+    suspend fun getAllExerciseSetsById(id: Int) : List<ExerciseSetDB>
 
     @Insert
-    suspend fun insert(exerciseSetDB: ExerciseSetDB)
+    suspend fun insert(exerciseSetDB: ExerciseSetDB): Long
 
     @Query("DELETE FROM exercise_sets WHERE id = :id")
     suspend fun deleteById(id: Int)
@@ -178,7 +181,7 @@ interface ExerciseSetDao {
                 WorkoutDB::class,
                 ExerciseDB::class,
                 ExerciseSetDB::class],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

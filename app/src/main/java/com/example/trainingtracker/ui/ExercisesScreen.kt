@@ -42,7 +42,6 @@ import com.example.trainingtracker.model.Movement
 @Composable
 fun ExercisesScreen( viewModel: MovementViewModel = viewModel() )
 {
-    // todo: get data from db
     Box (modifier = Modifier.fillMaxSize()){
         LazyColumn {
             items(viewModel.movements) { movement ->
@@ -260,7 +259,6 @@ fun EditMovementState(
             Spacer(modifier = Modifier.weight(1f))
             Button(onClick = {
                 updateDialogData(dialogData.copy(showDialog = false))
-                // Todo: update database with new name
                 viewModel.renameMovement(movement, exerciseName);
             }) {
                 Text("Confirm")
@@ -296,7 +294,6 @@ fun DeleteMovementState(
             Button(onClick = {
                 updateDialogData(dialogData.copy(state = 1, showDialog = false))
                 viewModel.removeMovement(movement);
-                // Todo: delete from database
             },
                 colors = ButtonDefaults.buttonColors(Color.Red, Color.White)
             ) {
