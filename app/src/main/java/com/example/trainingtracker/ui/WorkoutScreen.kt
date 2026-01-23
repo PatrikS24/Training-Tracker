@@ -69,7 +69,7 @@ fun WorkoutScreen( viewModel: WorkoutViewModel = viewModel() )
     when (viewModel.state) {
         WorkoutScreenState.inactive -> NoActiveWorkout(viewModel)
         WorkoutScreenState.active -> ActiveWorkout(viewModel)
-        WorkoutScreenState.search -> return
+        WorkoutScreenState.search -> FullScreenSearchBar(viewModel)
     }
 }
 
@@ -142,7 +142,7 @@ fun ExerciseCard( viewModel: WorkoutViewModel = viewModel(), exercise: Exercise 
             exercise.movement?.name?.let { Text(text = it, style = MaterialTheme.typography.titleLarge) }
 
             Button(onClick = {
-
+                viewModel.state = WorkoutScreenState.search
             }) {
                 Text("Add movement")
             }
@@ -192,19 +192,43 @@ fun SearchScreen( viewModel: WorkoutViewModel = viewModel() ) {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SimpleSearchBar(
-    query: String,
-    onQueryChange: (String) -> Unit
-) {
-    OutlinedTextField(
-        value = query,
-        onValueChange = onQueryChange,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        placeholder = { Text("Search...") },
-        singleLine = true,
-        shape = RoundedCornerShape(8.dp) // Minimalist rounded corners
-    )
+fun FullScreenSearchBar( viewModel: WorkoutViewModel = viewModel() ) {
+    var query by remember { mutableStateOf("") }
+    var active by remember { mutableStateOf(false) }
+    viewModel.getAllMovements()
+
+    SearchBar(
+        query = query,
+        onQueryChange = { query = it },
+        onSearch = { active = false },
+        active = active,
+        onActiveChange = { active = it }
+    ) {
+        // Everything inside these braces appears ONLY when 'active' is true
+        val filteredResults = viewModel.movements.filter { it.name.contains(query, ignoreCase = true) }
+
+        if (filteredResults.isEmpty() && query.isNotEmpty()) {
+            Text("No results found for '$query'", modifier = Modifier.padding(16.dp))
+        } else {
+            LazyColumn {
+                items(filteredResults) { result ->
+                    // What each search result looks like
+                    Text(
+                        text = result.name,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .clickable {
+                                /* Handle selection */
+
+                                active = false
+                                viewModel.state = WorkoutScreenState.active
+                            }
+                    )
+                }
+            }
+        }
+    }
 }

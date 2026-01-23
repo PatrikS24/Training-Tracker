@@ -2,8 +2,10 @@ package com.example.trainingtracker.controller
 
 import android.app.Application
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trainingtracker.model.Exercise
@@ -19,6 +21,8 @@ class WorkoutViewModel(application: Application) :
 
     var state : WorkoutScreenState by mutableStateOf(WorkoutScreenState.inactive)
 
+    var movements = mutableStateListOf<MovementDB>()
+
     private val workoutDao = DatabaseProvider
         .getDatabase(application)
         .workoutDao()
@@ -30,6 +34,7 @@ class WorkoutViewModel(application: Application) :
     private val movementDao = DatabaseProvider
         .getDatabase(application)
         .movementDao()
+
 
     fun hasActiveWorkout(): Boolean {
         return !activeWorkout.equals( nonActiveWorkout )
@@ -133,6 +138,16 @@ class WorkoutViewModel(application: Application) :
 
     fun setScreenState(screenState: WorkoutScreenState) {
         state = screenState
+    }
+
+    fun getAllMovements() {
+        viewModelScope.launch {
+            val dbMovements: List<MovementDB> = movementDao.getAllMovements()
+
+            movements.clear()
+            movements.addAll(dbMovements)
+            movements.sortBy { it.name.lowercase() }
+        }
     }
 }
 
