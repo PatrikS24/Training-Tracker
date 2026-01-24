@@ -130,6 +130,9 @@ interface ExerciseDao {
     @Update
     suspend fun updateExercise(exerciseDB: ExerciseDB)
 
+    @Query("UPDATE exercises SET orderIndex = :orderIndex WHERE id = :id")
+    suspend fun updateOrderIndex(id: Int, orderIndex: Int)
+
     @Query("""
         SELECT e.*
         FROM exercises e

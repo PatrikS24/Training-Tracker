@@ -11,9 +11,8 @@
   <component name="ChangeListManager">
     <list default="true" id="c9818fc2-7176-41b1-af33-35184a422594" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/trainingtracker/ui/ExerciseCard.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/trainingtracker/ui/ExerciseCard.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/trainingtracker/ui/ExercisesScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/trainingtracker/ui/ExercisesScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/trainingtracker/ui/SetCard.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/trainingtracker/ui/SetCard.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/trainingtracker/controller/DbHelper.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/trainingtracker/controller/DbHelper.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/trainingtracker/controller/WorkoutViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/trainingtracker/controller/WorkoutViewModel.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

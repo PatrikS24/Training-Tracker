@@ -143,7 +143,17 @@ class WorkoutViewModel(application: Application) :
         viewModelScope.launch {
             exerciseDao.deleteById(exercise.id)
             activeWorkout.exercises.remove(exercise)
-            // todo: update order index
+            updateExerciseOrderIndexes()
+        }
+    }
+
+    fun updateExerciseOrderIndexes() {
+        viewModelScope.launch {
+            for (index in 0..<activeWorkout.exercises.size) {
+                var exercise = activeWorkout.exercises[index]
+                exercise.orderIndex = index
+                exerciseDao.updateOrderIndex(exercise.id, index)
+            }
         }
     }
 
@@ -169,6 +179,7 @@ class WorkoutViewModel(application: Application) :
 
                     activeWorkout.exercises.add(exercise)
                 }
+                activeWorkout.exercises.sortBy { it.orderIndex }
             }
         }
     }
