@@ -51,6 +51,7 @@ fun ExerciseCard( viewModel: WorkoutViewModel = viewModel(), exercise: Exercise,
                     Button(onClick = {
                         viewModel.state = WorkoutScreenState.search
                         onSearchTriggered(exercise)
+                        viewModel.getPreviousSetsForExercise(exercise)
                     }) {
                         Text("Choose movement")
                     }
@@ -89,14 +90,23 @@ fun ExerciseCard( viewModel: WorkoutViewModel = viewModel(), exercise: Exercise,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     for (set in exercise.sets) {
-                        SetCard(viewModel, set)
+                        SetCard(viewModel, set, exercise)
                     }
 
+                    Row {
+                        TextButton(onClick = {
+                            viewModel.createSet(exercise)
+                        }) {
+                            Text("Add Set")
+                        }
 
-                    TextButton(onClick = {
-                        viewModel.createSet(exercise)
-                    }) {
-                        Text("Add Set")
+                        if (exercise.sets.size > 1) {
+                            TextButton(onClick = {
+                                viewModel.deleteSet(exercise.sets.last(), exercise)
+                            }) {
+                                Text("Remove Set")
+                            }
+                        }
                     }
                 }
             }

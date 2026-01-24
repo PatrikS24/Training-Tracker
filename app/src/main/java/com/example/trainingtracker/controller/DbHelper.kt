@@ -129,6 +129,20 @@ interface ExerciseDao {
 
     @Update
     suspend fun updateExercise(exerciseDB: ExerciseDB)
+
+    @Query("""
+        SELECT e.*
+        FROM exercises e
+        INNER JOIN workouts w ON e.workoutId = w.id
+        WHERE e.movementId = :movementId
+        AND w.completed = 1
+        ORDER BY w.startTime DESC
+        LIMIT 1
+    """)
+    suspend fun getLatestCompletedExerciseForMovement(
+        movementId: Int
+    ): ExerciseDB?
+
 }
 
 @Entity(

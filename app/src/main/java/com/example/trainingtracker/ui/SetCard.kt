@@ -1,5 +1,6 @@
 package com.example.trainingtracker.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,13 +43,14 @@ import com.example.trainingtracker.model.ExerciseSet
 import kotlin.text.toDouble
 import kotlin.text.toInt
 
+@SuppressLint("MutableCollectionMutableState")
 @Composable
-fun SetCard( viewModel: WorkoutViewModel = viewModel(), set: ExerciseSet ) {
+fun SetCard( viewModel: WorkoutViewModel = viewModel(), set: ExerciseSet, exercise: Exercise ) {
 
     var weight by remember { mutableStateOf("") }
     var reps by remember { mutableStateOf("") }
     var completed by remember { mutableStateOf(set.completed) }
-    
+
     Card(
         modifier = Modifier
             .fillMaxSize(),
@@ -65,8 +67,16 @@ fun SetCard( viewModel: WorkoutViewModel = viewModel(), set: ExerciseSet ) {
 
             Text(set.orderIndex.toString())
 
-            // Todo: Actually make this work
-            Text("40 kg x 7")
+            viewModel.getPreviousSetsForExercise(exercise)
+
+            val previousSet = exercise.previousSets
+                .getOrNull(set.orderIndex - 1)
+
+            val previousReps = previousSet?.reps?.toString() ?: "-"
+            val previousWeight = previousSet?.weight?.toString() ?: "-"
+
+            Text("$previousWeight kg x $previousReps")
+
 
 
             CompactNumericInput(

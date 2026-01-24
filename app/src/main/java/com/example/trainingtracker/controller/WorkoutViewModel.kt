@@ -113,6 +113,8 @@ class WorkoutViewModel(application: Application) :
     }
 
     fun finishWorkout() {
+        // Todo: remove unfinished sets from exercises
+        //       remove exercises if no sets were completed
         activeWorkout.completed = true
         setScreenState(WorkoutScreenState.inactive)
         updateDatabase()
@@ -121,21 +123,19 @@ class WorkoutViewModel(application: Application) :
 
     fun createExercise() {
         viewModelScope.launch {
-            var exerciseDb = ExerciseDB(
+            val exerciseDb = ExerciseDB(
                 id = 0,
                 movementId = null,
                 workoutId = activeWorkout.id,
                 orderIndex = activeWorkout.exercises.size,
                 notes = ""
             )
-            var id = exerciseDao.insert(exerciseDb)
-            var exercise = Exercise(
+            val id = exerciseDao.insert(exerciseDb)
+            val exercise = Exercise(
                 id = id.toInt()
             )
             exercise.orderIndex = activeWorkout.exercises.size
             activeWorkout.exercises.add(exercise)
-
-            createSet(exercise)
         }
     }
 
@@ -153,7 +153,7 @@ class WorkoutViewModel(application: Application) :
             viewModelScope.launch {
                 val dbExercises = exerciseDao.getAllExercisesById(activeWorkout.id)
                 for (dbExercise in dbExercises) {
-                    var exercise = Exercise(id = dbExercise.id)
+                    val exercise = Exercise(id = dbExercise.id)
                     val dbMovement = movementDao.getMovementById(dbExercise.movementId)
                     try {
                         exercise.movement = Movement(id = dbMovement.id, name = dbMovement.name)
@@ -164,6 +164,8 @@ class WorkoutViewModel(application: Application) :
                     exercise.notes = dbExercise.notes
 
                     getSetsForExercise(exercise)
+
+                    getPreviousSetsForExercise(exercise)
 
                     activeWorkout.exercises.add(exercise)
                 }
@@ -180,6 +182,29 @@ class WorkoutViewModel(application: Application) :
                     orderIndex = exercise.orderIndex,
                     notes = exercise.notes)
                 exerciseDao.updateExercise(dbExercise)
+            }
+        }
+    }
+
+    fun getPreviousSetsForExercise(exercise: Exercise) {
+        if (exercise.movement == null) return
+        if (!hasActiveWorkout()) return
+        viewModelScope.launch {
+            val dbPrevExercise = exerciseDao.getLatestCompletedExerciseForMovement(exercise.movement!!.id)
+            if (dbPrevExercise != null) {
+                val dbPrevSets = exerciseSetDao.getAllExerciseSetsById(dbPrevExercise.id )
+                val prevSets = dbPrevSets
+                    .map { ExerciseSet(id = it.id).apply {
+                        weight = it.weight
+                        reps = it.reps
+                        isWarmup = it.isWarmup
+                        orderIndex = it.orderIndex
+                        completed = it.completed
+                    } }
+                    .sortedBy { it.orderIndex }
+
+                exercise.previousSets.clear()
+                exercise.previousSets.addAll(prevSets)
             }
         }
     }
@@ -211,6 +236,13 @@ class WorkoutViewModel(application: Application) :
             )
             set.orderIndex = exercise.sets.size + 1
             exercise.sets.add(set)
+        }
+    }
+
+    fun deleteSet(set: ExerciseSet, exercise: Exercise) {
+        viewModelScope.launch {
+            exerciseSetDao.deleteById(set.id)
+            exercise.sets.remove(set)
         }
     }
 

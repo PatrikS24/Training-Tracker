@@ -36,6 +36,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -74,7 +76,9 @@ fun WorkoutScreen( viewModel: WorkoutViewModel = viewModel() )
 fun NoActiveWorkout(viewModel: WorkoutViewModel = viewModel()) {
     // todo: add workout history
     Column (modifier = Modifier.fillMaxSize().padding(16.dp)){
-        Spacer(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.5f))
+
+        Spacer(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.4f))
+
         Button(onClick = {
             viewModel.createWorkout()
         },
@@ -82,7 +86,26 @@ fun NoActiveWorkout(viewModel: WorkoutViewModel = viewModel()) {
         {
             Text("Start new workout")
         }
-        Spacer(modifier = Modifier.fillMaxWidth().fillMaxHeight())
+
+        Spacer(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.1f))
+
+        var showDeleteWorkoutTableDialog by remember { mutableStateOf(false) }
+        Button(
+            onClick = {
+                showDeleteWorkoutTableDialog = true
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Delete workout table")
+        }
+        if (showDeleteWorkoutTableDialog) {
+            AreYouSureDialog("Are you sure you want to delete all workout tables?") {
+                    isSure ->
+                showDeleteWorkoutTableDialog = false
+                if (isSure) {viewModel.deleteAllWorkouts()}
+
+            }
+        }
     }
 }
 
@@ -105,7 +128,6 @@ fun ActiveWorkout(viewModel: WorkoutViewModel = viewModel(), onSearchTriggered: 
             var showFinishWorkoutDialog by remember { mutableStateOf(false) }
 
             TextButton(onClick = {
-                // todo: finish workout
                 showFinishWorkoutDialog = true
             }) {
                 Text("Finish")
@@ -114,16 +136,21 @@ fun ActiveWorkout(viewModel: WorkoutViewModel = viewModel(), onSearchTriggered: 
             if (showFinishWorkoutDialog) {
                 AreYouSureDialog("Are you sure you want to finish this workout?") {
                     isSure ->
+                    if (isSure) {
+                        viewModel.finishWorkout()
+                    }
                     showFinishWorkoutDialog = false
-                    viewModel.finishWorkout()
                 }
             }
         }
 
         LazyColumn (modifier = Modifier.weight(1f)){
             items(viewModel.activeWorkout.exercises) { exercise ->
-                ExerciseCard(viewModel, exercise, onSearchTriggered = { dataFromHome ->
-                    onSearchTriggered(dataFromHome)})
+
+                ExerciseCard(viewModel, exercise, onSearchTriggered = {
+                    dataFromHome ->
+                    onSearchTriggered(dataFromHome)
+                })
             }
             item {
                 Column(
@@ -153,25 +180,6 @@ fun ActiveWorkout(viewModel: WorkoutViewModel = viewModel(), onSearchTriggered: 
                         }
                     }
                 }
-            }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-
-        var showDeleteWorkoutTableDialog by remember { mutableStateOf(false) }
-        Button(
-            onClick = {
-                showDeleteWorkoutTableDialog = true
-                },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Delete workout table")
-        }
-        if (showDeleteWorkoutTableDialog) {
-            AreYouSureDialog("Are you sure you want to delete all workout tables?") {
-                isSure ->
-                showDeleteWorkoutTableDialog = false
-                if (isSure) {viewModel.deleteAllWorkouts()}
-
             }
         }
     }
@@ -208,6 +216,9 @@ fun ClickToEditText(initialText: String? = "", viewModel: WorkoutViewModel = vie
     var text by remember { mutableStateOf(initialText) }
     var isFocused by remember { mutableStateOf(false) }
 
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
     val style = LocalTextStyle.current.copy(
         color = LocalContentColor.current
     )
@@ -233,6 +244,8 @@ fun ClickToEditText(initialText: String? = "", viewModel: WorkoutViewModel = vie
                 if (text != null) {
                     viewModel.activeWorkout.name = it1
                 }
+                keyboardController?.hide()
+                focusManager.clearFocus()
                 viewModel.updateDatabase()
             }
             )
