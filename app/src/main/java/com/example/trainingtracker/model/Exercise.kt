@@ -11,4 +11,11 @@ class Exercise(val id : Int) {
     var notes : String = "";
     var orderIndex = 0;
     var previousSets: MutableList<ExerciseSet> = mutableStateListOf<ExerciseSet>()
+
+    fun onMovementChosen( viewModel: WorkoutViewModel) {
+        viewModel.getPreviousSetsForExercise(this)
+        if (sets.isEmpty()) {
+            viewModel.createSet(this)
+        }
+    }
 }

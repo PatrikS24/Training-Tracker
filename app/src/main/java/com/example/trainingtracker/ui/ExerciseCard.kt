@@ -51,7 +51,6 @@ fun ExerciseCard( viewModel: WorkoutViewModel = viewModel(), exercise: Exercise,
                     Button(onClick = {
                         viewModel.state = WorkoutScreenState.search
                         onSearchTriggered(exercise)
-                        viewModel.getPreviousSetsForExercise(exercise)
                     }) {
                         Text("Choose movement")
                     }

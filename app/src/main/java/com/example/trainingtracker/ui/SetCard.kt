@@ -51,6 +51,12 @@ fun SetCard( viewModel: WorkoutViewModel = viewModel(), set: ExerciseSet, exerci
     var reps by remember { mutableStateOf("") }
     var completed by remember { mutableStateOf(set.completed) }
 
+    val previousSet = exercise.previousSets
+        .getOrNull(set.orderIndex - 1)
+
+    val previousReps = previousSet?.reps?.toString() ?: "-"
+    val previousWeight = previousSet?.weight?.toString() ?: "-"
+
     Card(
         modifier = Modifier
             .fillMaxSize(),
@@ -67,13 +73,6 @@ fun SetCard( viewModel: WorkoutViewModel = viewModel(), set: ExerciseSet, exerci
 
             Text(set.orderIndex.toString())
 
-            viewModel.getPreviousSetsForExercise(exercise)
-
-            val previousSet = exercise.previousSets
-                .getOrNull(set.orderIndex - 1)
-
-            val previousReps = previousSet?.reps?.toString() ?: "-"
-            val previousWeight = previousSet?.weight?.toString() ?: "-"
 
             Text("$previousWeight kg x $previousReps")
 

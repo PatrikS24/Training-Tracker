@@ -169,6 +169,7 @@ fun ActiveWorkout(viewModel: WorkoutViewModel = viewModel(), onSearchTriggered: 
                     }) {
                         Text("Cancel Workout")
                     }
+
                     if (showCancelWorkoutDialog) {
                         AreYouSureDialog("Are you sure you want to cancel this workout?") {
                                 isSure ->
@@ -291,6 +292,7 @@ fun SearchScreen(viewModel: WorkoutViewModel = viewModel(), exercise: Exercise?,
                                 /* Handle selection */
                                 exercise?.movement = Movement(result.id, result.name)
                                 viewModel.updateExercise(exercise)
+                                exercise?.onMovementChosen(viewModel)
                                 active = false
                                 viewModel.setScreenState( WorkoutScreenState.active )
                             }
