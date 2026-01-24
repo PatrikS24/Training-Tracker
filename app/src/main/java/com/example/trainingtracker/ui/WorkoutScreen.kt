@@ -3,7 +3,6 @@ package com.example.trainingtracker.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,16 +18,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.SearchBar
@@ -37,6 +29,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -52,7 +45,8 @@ import com.example.trainingtracker.controller.WorkoutScreenState
 import com.example.trainingtracker.controller.WorkoutViewModel
 import com.example.trainingtracker.model.Exercise
 import com.example.trainingtracker.model.Movement
-import kotlin.math.min
+import kotlinx.coroutines.delay
+import java.util.Date
 
 @Composable
 fun WorkoutScreen( viewModel: WorkoutViewModel = viewModel() )
@@ -106,11 +100,24 @@ fun ActiveWorkout(viewModel: WorkoutViewModel = viewModel(), onSearchTriggered: 
         ){
             ClickToEditText(viewModel.activeWorkout.name)
 
-            var minutes = viewModel.activeWorkout.durationMinutes
-            var hoursOnClock = minutes / 60
-            var minutesOnClock = minutes % 60
-            var time = "%02d:%02d".format(hoursOnClock, minutesOnClock)
-            Text(time)
+            WorkoutDurationDisplay(viewModel.activeWorkout.startTime)
+
+            var showFinishWorkoutDialog by remember { mutableStateOf(false) }
+
+            TextButton(onClick = {
+                // todo: finish workout
+                showFinishWorkoutDialog = true
+            }) {
+                Text("Finish")
+            }
+
+            if (showFinishWorkoutDialog) {
+                AreYouSureDialog("Are you sure you want to finish this workout?") {
+                    isSure ->
+                    showFinishWorkoutDialog = false
+                    viewModel.finishWorkout()
+                }
+            }
         }
 
         LazyColumn (modifier = Modifier.weight(1f)){
@@ -170,6 +177,31 @@ fun ActiveWorkout(viewModel: WorkoutViewModel = viewModel(), onSearchTriggered: 
     }
 }
 
+@Composable
+fun WorkoutDurationDisplay(startTime: Date) {
+    // State to hold the formatted string
+    var currentTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
+
+    // Update the currentTime every second
+    LaunchedEffect(key1 = startTime) {
+        while (true) {
+            currentTime = System.currentTimeMillis()
+            delay(1000L)
+        }
+    }
+
+    // Calculate the difference
+    val elapsedMillis = currentTime - startTime.time
+    val seconds = (elapsedMillis / 1000) % 60
+    val minutes = (elapsedMillis / (1000 * 60)) % 60
+    val hours = (elapsedMillis / (1000 * 60 * 60))
+
+    val timeString = "%02d:%02d:%02d".format(hours, minutes, seconds)
+
+    Text(
+        text = timeString
+    )
+}
 
 @Composable
 fun ClickToEditText(initialText: String? = "", viewModel: WorkoutViewModel = viewModel()) {

@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,13 +39,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.trainingtracker.controller.WorkoutViewModel
 import com.example.trainingtracker.model.Exercise
 import com.example.trainingtracker.model.ExerciseSet
+import kotlin.text.toDouble
+import kotlin.text.toInt
 
 @Composable
 fun SetCard( viewModel: WorkoutViewModel = viewModel(), set: ExerciseSet ) {
 
     var weight by remember { mutableStateOf("") }
     var reps by remember { mutableStateOf("") }
-    var completed by remember { mutableStateOf(false) }
+    var completed by remember { mutableStateOf(set.completed) }
     
     Card(
         modifier = Modifier
@@ -72,10 +75,12 @@ fun SetCard( viewModel: WorkoutViewModel = viewModel(), set: ExerciseSet ) {
                 placeholder = set.weight.toString(),
                 isDecimal = true,
                 onDone = {
-                    if (weight != "") {
+                    try {
+                        viewModel.updateSetReps(set, reps.toInt())
+                    } catch (e: NumberFormatException) { }
+                    try {
                         viewModel.updateSetWeight(set, weight.toDouble())
-
-                    }
+                    } catch (e: NumberFormatException) { }
                 }
             )
 
@@ -85,9 +90,12 @@ fun SetCard( viewModel: WorkoutViewModel = viewModel(), set: ExerciseSet ) {
                 placeholder = set.reps.toString(),
                 isDecimal = false,
                 onDone = {
-                    if (reps != "") {
+                    try {
                         viewModel.updateSetReps(set, reps.toInt())
-                    }
+                    } catch (e: NumberFormatException) { }
+                    try {
+                        viewModel.updateSetWeight(set, weight.toDouble())
+                    } catch (e: NumberFormatException) { }
                 }
             )
 
@@ -96,6 +104,12 @@ fun SetCard( viewModel: WorkoutViewModel = viewModel(), set: ExerciseSet ) {
                 onCheckedChange = {
                     completed = it
                     viewModel.updateSetCompleted(set, completed)
+                    try {
+                        viewModel.updateSetReps(set, reps.toInt())
+                    } catch (e: NumberFormatException) { }
+                    try {
+                        viewModel.updateSetWeight(set, weight.toDouble())
+                    } catch (e: NumberFormatException) { }
                 }
             )
             }
@@ -137,7 +151,7 @@ fun CompactNumericInput(
             .height(30.dp)
             .background(Color.DarkGray, RoundedCornerShape(8.dp))
             .padding(horizontal = 12.dp),
-        textStyle = TextStyle(fontSize = 14.sp, color = Color.White),
+        textStyle = TextStyle(fontSize = 14.sp, color = Color.White, textAlign = TextAlign.End),
         singleLine = true,
         keyboardOptions = KeyboardOptions(
             keyboardType = if (isDecimal) KeyboardType.Decimal else KeyboardType.Number,
@@ -151,9 +165,9 @@ fun CompactNumericInput(
             },
         ),
         decorationBox = { innerTextField ->
-            Box(contentAlignment = Alignment.CenterStart) {
+            Box(contentAlignment = Alignment.CenterEnd) {
                 if (value.isEmpty()) {
-                    Text(placeholder, color = Color.White, fontSize = 14.sp, maxLines = 1,
+                    Text(placeholder, color = Color.White, textAlign = TextAlign.End, fontSize = 14.sp, maxLines = 1,
                         overflow = TextOverflow.Ellipsis)
                 }
                 innerTextField()

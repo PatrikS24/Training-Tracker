@@ -56,8 +56,10 @@ class WorkoutViewModel(application: Application) :
                 newActive.completed = active[0].completed
                 activeWorkout = newActive
                 getExercisesForWorkout()
+                setScreenState(WorkoutScreenState.active)
             } else {
-                state = WorkoutScreenState.inactive
+                activeWorkout = nonActiveWorkout
+                setScreenState(WorkoutScreenState.inactive)
             }
         }
     }
@@ -110,6 +112,13 @@ class WorkoutViewModel(application: Application) :
         }
     }
 
+    fun finishWorkout() {
+        activeWorkout.completed = true
+        setScreenState(WorkoutScreenState.inactive)
+        updateDatabase()
+        activeWorkout = nonActiveWorkout
+    }
+
     fun createExercise() {
         viewModelScope.launch {
             var exerciseDb = ExerciseDB(
@@ -125,6 +134,8 @@ class WorkoutViewModel(application: Application) :
             )
             exercise.orderIndex = activeWorkout.exercises.size
             activeWorkout.exercises.add(exercise)
+
+            createSet(exercise)
         }
     }
 
@@ -132,6 +143,7 @@ class WorkoutViewModel(application: Application) :
         viewModelScope.launch {
             exerciseDao.deleteById(exercise.id)
             activeWorkout.exercises.remove(exercise)
+            // todo: update order index
         }
     }
 
