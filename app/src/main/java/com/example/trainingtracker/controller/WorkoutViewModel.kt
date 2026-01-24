@@ -48,14 +48,14 @@ class WorkoutViewModel(application: Application) :
         if (hasActiveWorkout()) return
 
         viewModelScope.launch {
-            var active = workoutDao.getActive()
+            val active = workoutDao.getActive()
             if (!active.isEmpty() && !active[0].completed) {
-                activeWorkout = Workout(active[0].id, active[0].name)
-                activeWorkout.startTime = active[0].startTime
-                activeWorkout.updateDuration()
-                activeWorkout.completed = active[0].completed
+                val newActive = Workout(active[0].id, active[0].name)
+                newActive.startTime = active[0].startTime
+                newActive.updateDuration()
+                newActive.completed = active[0].completed
+                activeWorkout = newActive
                 getExercisesForWorkout()
-                state = WorkoutScreenState.active
             } else {
                 state = WorkoutScreenState.inactive
             }
@@ -73,7 +73,9 @@ class WorkoutViewModel(application: Application) :
         viewModelScope.launch {
             workoutDao.insert(newWorkout)
             getActiveWorkout()
-            state = WorkoutScreenState.active
+            if (hasActiveWorkout()) {
+                state = WorkoutScreenState.active
+            }
         }
     }
 
@@ -97,6 +99,14 @@ class WorkoutViewModel(application: Application) :
             getActiveWorkout()
             activeWorkout = nonActiveWorkout
             state = WorkoutScreenState.inactive
+        }
+    }
+
+    fun deleteActiveWorkout() {
+        viewModelScope.launch {
+            workoutDao.deleteById(activeWorkout.id)
+            activeWorkout = nonActiveWorkout
+            setScreenState(WorkoutScreenState.inactive)
         }
     }
 
@@ -181,13 +191,13 @@ class WorkoutViewModel(application: Application) :
             var setDb = ExerciseSetDB(
                 id = 0,
                 exerciseId = exercise.id,
-                orderIndex = exercise.sets.size
+                orderIndex = exercise.sets.size + 1
             )
             var id = exerciseSetDao.insert(setDb)
             var set = ExerciseSet(
                 id = id.toInt()
             )
-            set.orderIndex = exercise.sets.size
+            set.orderIndex = exercise.sets.size + 1
             exercise.sets.add(set)
         }
     }
@@ -209,6 +219,39 @@ class WorkoutViewModel(application: Application) :
                     exercise.sets.add(set)
                 }
             //}
+        }
+    }
+
+    fun updateSet(set: ExerciseSet, exercise: Exercise) {
+        viewModelScope.launch {
+            val dbSet = ExerciseSetDB(
+                id = set.id,
+                exerciseId = exercise.id,
+                orderIndex = set.orderIndex,
+                weight = set.weight,
+                reps = set.reps,
+                isWarmup = set.isWarmup,
+                completed = set.completed
+            )
+            exerciseSetDao.updateSet(dbSet)
+        }
+    }
+
+    fun updateSetWeight(set: ExerciseSet, weight: Double) {
+        viewModelScope.launch {
+            exerciseSetDao.updateWeight(set.id, weight)
+        }
+    }
+
+    fun updateSetReps(set: ExerciseSet, reps: Int) {
+        viewModelScope.launch {
+            exerciseSetDao.updateReps(set.id, reps)
+        }
+    }
+
+    fun updateSetCompleted(set: ExerciseSet, completed: Boolean) {
+        viewModelScope.launch {
+            exerciseSetDao.updateCompleted(set.id, completed)
         }
     }
 }

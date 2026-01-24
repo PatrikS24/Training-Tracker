@@ -72,7 +72,6 @@ fun WorkoutScreen( viewModel: WorkoutViewModel = viewModel() )
         WorkoutScreenState.search -> SearchScreen(viewModel, initialSearchQuery,
             onDismiss = {
                 viewModel.setScreenState( WorkoutScreenState.active )
-
         })
     }
 }
@@ -96,7 +95,7 @@ fun NoActiveWorkout(viewModel: WorkoutViewModel = viewModel()) {
 @Composable
 fun ActiveWorkout(viewModel: WorkoutViewModel = viewModel(), onSearchTriggered: (Exercise?) -> Unit) {
     Column (
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(0.dp),
         horizontalAlignment = Alignment.CenterHorizontally){
 
         // Top bar
@@ -141,7 +140,7 @@ fun ActiveWorkout(viewModel: WorkoutViewModel = viewModel(), onSearchTriggered: 
                                 isSure ->
                             showCancelWorkoutDialog = false
                             if (isSure) {
-                            // todo: cancel workout
+                                viewModel.deleteActiveWorkout()
                             }
 
                         }

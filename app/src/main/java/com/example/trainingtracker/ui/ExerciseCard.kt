@@ -15,6 +15,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -39,8 +40,8 @@ fun ExerciseCard( viewModel: WorkoutViewModel = viewModel(), exercise: Exercise,
             .padding(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(modifier = Modifier.padding(5.dp),
-            horizontalAlignment = Alignment.End) {
+        Column(modifier = Modifier.padding(5.dp).fillMaxWidth(),
+            horizontalAlignment = Alignment.Start) {
             if (exercise.movement == null) { // No movement chosen yet
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(5.dp),
@@ -69,6 +70,34 @@ fun ExerciseCard( viewModel: WorkoutViewModel = viewModel(), exercise: Exercise,
                         onSearchTriggered(exercise)
                     })
                     Text(exercise.movement!!.name)
+                }
+
+                Row (
+                    modifier = Modifier.fillMaxWidth().padding(5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
+                    Text("Set")
+                    Text("Previous")
+                    Text("Kg")
+                    Text("Reps")
+                    Text("Done")
+                }
+
+                Column(
+                    modifier = Modifier.padding(5.dp).fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    for (set in exercise.sets) {
+                        SetCard(viewModel, set)
+                    }
+
+
+                    TextButton(onClick = {
+                        viewModel.createSet(exercise)
+                    }) {
+                        Text("Add Set")
+                    }
                 }
             }
 

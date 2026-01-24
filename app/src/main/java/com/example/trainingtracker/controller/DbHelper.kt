@@ -172,6 +172,12 @@ interface ExerciseSetDao {
 
     @Query("UPDATE exercise_sets SET weight = :weight WHERE id = :id")
     suspend fun updateWeight(id: Int, weight: Double)
+
+    @Query("UPDATE exercise_sets SET completed = :completed WHERE id = :id")
+    suspend fun updateCompleted(id: Int, completed: Boolean)
+
+    @Update
+    suspend fun updateSet(set: ExerciseSetDB)
 }
 
 
