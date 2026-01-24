@@ -14,10 +14,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -144,41 +146,44 @@ fun ActiveWorkout(viewModel: WorkoutViewModel = viewModel(), onSearchTriggered: 
             }
         }
 
-        LazyColumn (modifier = Modifier.weight(1f)){
-            items(viewModel.activeWorkout.exercises) { exercise ->
+        val scrollState = rememberScrollState()
+
+        Column (
+            modifier = Modifier.weight(1f).verticalScroll(scrollState)
+        ){
+            for (exercise in viewModel.activeWorkout.exercises) {
 
                 ExerciseCard(viewModel, exercise, onSearchTriggered = {
                     dataFromHome ->
                     onSearchTriggered(dataFromHome)
                 })
             }
-            item {
-                Column(
-                    Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Button(onClick = {
-                        viewModel.createExercise()
-                    }) {
-                        Text("Add Exercise")
-                    }
-                    var showCancelWorkoutDialog by remember { mutableStateOf(false) }
 
-                    TextButton(onClick = {
-                        showCancelWorkoutDialog = true
-                    }) {
-                        Text("Cancel Workout")
-                    }
+            Column(
+                Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Button(onClick = {
+                    viewModel.createExercise()
+                }) {
+                    Text("Add Exercise")
+                }
+                var showCancelWorkoutDialog by remember { mutableStateOf(false) }
 
-                    if (showCancelWorkoutDialog) {
-                        AreYouSureDialog("Are you sure you want to cancel this workout?") {
-                                isSure ->
-                            showCancelWorkoutDialog = false
-                            if (isSure) {
-                                viewModel.deleteActiveWorkout()
-                            }
+                TextButton(onClick = {
+                    showCancelWorkoutDialog = true
+                }) {
+                    Text("Cancel Workout")
+                }
 
+                if (showCancelWorkoutDialog) {
+                    AreYouSureDialog("Are you sure you want to cancel this workout?") {
+                            isSure ->
+                        showCancelWorkoutDialog = false
+                        if (isSure) {
+                            viewModel.deleteActiveWorkout()
                         }
+
                     }
                 }
             }
