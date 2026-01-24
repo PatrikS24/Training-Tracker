@@ -22,6 +22,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -222,6 +223,7 @@ fun EditMovementState(
         Row (
             modifier = Modifier.padding(3.dp),
             horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
             ) {
             Text(
                 text = "Edit exercise name",
@@ -231,10 +233,10 @@ fun EditMovementState(
             )
             Spacer(modifier = Modifier.weight(1f))
 
-            Button(onClick = {
+            TextButton(onClick = {
                 updateDialogData(dialogData.copy(state = 2))
-            },
-                colors = ButtonDefaults.buttonColors(Color.Red, Color.White)) {
+            }
+            ) {
                 Text("Delete")
             }
         }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
@@ -78,7 +79,7 @@ fun ExerciseCard( viewModel: WorkoutViewModel = viewModel(), exercise: Exercise,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ){
                     Text("Set")
-                    Text("Previous")
+                    Text("Previous", modifier = Modifier.width(90.dp))
                     Text("Kg")
                     Text("Reps")
                     Text("Done")

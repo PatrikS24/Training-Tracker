@@ -5,10 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -40,6 +42,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.trainingtracker.controller.WorkoutViewModel
 import com.example.trainingtracker.model.Exercise
 import com.example.trainingtracker.model.ExerciseSet
+import kotlinx.coroutines.processNextEventInCurrentThread
 import kotlin.text.toDouble
 import kotlin.text.toInt
 
@@ -47,15 +50,25 @@ import kotlin.text.toInt
 @Composable
 fun SetCard( viewModel: WorkoutViewModel = viewModel(), set: ExerciseSet, exercise: Exercise ) {
 
-    var weight by remember { mutableStateOf("") }
-    var reps by remember { mutableStateOf("") }
-    var completed by remember { mutableStateOf(set.completed) }
 
     val previousSet = exercise.previousSets
         .getOrNull(set.orderIndex - 1)
 
     val previousReps = previousSet?.reps?.toString() ?: "-"
     val previousWeight = previousSet?.weight?.toString() ?: "-"
+
+    var weight by remember { mutableStateOf("") }
+
+    if (set.weight != 0.0) {
+        weight = set.weight.toString()
+    } else if (previousWeight == "-") {
+        weight = ""
+    } else {
+        weight = previousWeight
+    }
+
+    var reps by remember { mutableStateOf(if (set.reps != 0) set.reps.toString() else "") }
+    var completed by remember { mutableStateOf(set.completed) }
 
     Card(
         modifier = Modifier
@@ -71,10 +84,11 @@ fun SetCard( viewModel: WorkoutViewModel = viewModel(), set: ExerciseSet, exerci
             verticalAlignment = Alignment.CenterVertically
             ){
 
-            Text(set.orderIndex.toString())
+            Text(set.orderIndex.toString(),modifier = Modifier
+                    .width(30.dp))
 
 
-            Text("$previousWeight kg x $previousReps")
+            Text("$previousWeight kg x $previousReps", modifier = Modifier.width(90.dp))
 
 
 
@@ -109,6 +123,7 @@ fun SetCard( viewModel: WorkoutViewModel = viewModel(), set: ExerciseSet, exerci
             )
 
             Checkbox(
+                modifier = Modifier.padding(0.dp).size(16.dp),
                 checked = completed,
                 onCheckedChange = {
                     completed = it
