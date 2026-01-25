@@ -10,7 +10,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.trainingtracker.StatisticsScreen
 
 sealed class BottomNavItem(
     val route: String,
@@ -32,7 +31,7 @@ fun AppNavHost(navController: NavHostController) {
         navController = navController,
         startDestination = BottomNavItem.Workout.route
     ) {
-        composable("Workout") { WorkoutScreen() }
+        composable("workout") { WorkoutScreen() }
         composable("exercises") { ExercisesScreen() }
         composable("statistics") { StatisticsScreen() }
     }

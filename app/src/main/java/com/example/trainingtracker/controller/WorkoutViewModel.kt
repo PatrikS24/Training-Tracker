@@ -116,11 +116,43 @@ class WorkoutViewModel(application: Application) :
     fun finishWorkout() {
         // Todo: remove unfinished sets from exercises
         //       remove exercises if no sets were completed
+        removeUnfinishedSets(activeWorkout)
+        removeUnfinishedExercises(activeWorkout)
+
+        updateExerciseOrderIndexes()
+        for (exercise in activeWorkout.exercises) {
+            updateSetOrderIndexes(exercise)
+        }
+
         activeWorkout.updateDuration()
         activeWorkout.completed = true
         setScreenState(WorkoutScreenState.inactive)
         updateDatabase()
         activeWorkout = nonActiveWorkout
+    }
+
+    fun removeUnfinishedSets(workout: Workout) {
+        viewModelScope.launch {
+            for (exercise in workout.exercises) {
+                for (set in exercise.sets) {
+                    if (set.completed == false) {
+                        exerciseSetDao.deleteById(set.id)
+                    }
+                }
+                exercise.sets.removeIf { it.completed == false }
+            }
+        }
+    }
+
+    fun removeUnfinishedExercises(workout: Workout) { // Only removes exercises where no movement is chosen or no sets in sets list
+        viewModelScope.launch {
+            for (exercise in workout.exercises) {
+                if (exercise.sets.isEmpty() || exercise.movement == null) {
+                    exerciseDao.deleteById(exercise.id)
+                }
+            }
+            workout.exercises.removeIf { it.sets == emptyList<ExerciseSet>() || it.movement == null}
+        }
     }
 
     fun createExercise() {
@@ -151,8 +183,7 @@ class WorkoutViewModel(application: Application) :
 
     fun updateExerciseOrderIndexes() {
         viewModelScope.launch {
-            for (index in 0..<activeWorkout.exercises.size) {
-                var exercise = activeWorkout.exercises[index]
+            activeWorkout.exercises.toList().forEachIndexed { index, exercise ->
                 exercise.orderIndex = index
                 exerciseDao.updateOrderIndex(exercise.id, index)
             }
@@ -195,6 +226,15 @@ class WorkoutViewModel(application: Application) :
                     orderIndex = exercise.orderIndex,
                     notes = exercise.notes)
                 exerciseDao.updateExercise(dbExercise)
+            }
+        }
+    }
+
+    fun updateSetOrderIndexes(exercise: Exercise) {
+        viewModelScope.launch {
+            exercise.sets.toList().forEachIndexed { index, set ->
+                set.orderIndex = index
+                exerciseSetDao.updateOrderIndex(set.id, index)
             }
         }
     }

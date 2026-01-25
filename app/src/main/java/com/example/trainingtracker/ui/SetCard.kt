@@ -118,6 +118,7 @@ fun SetCard( viewModel: WorkoutViewModel, set: ExerciseSet, exercise: Exercise )
                 checked = completed,
                 onCheckedChange = {
                     completed = it
+                    set.completed = completed
                     viewModel.updateSetCompleted(set, completed)
                     updateWeightAndReps(viewModel, set, reps, weight)
                 }
@@ -161,7 +162,7 @@ fun CompactNumericInput(
             .height(30.dp)
             .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
             .padding(horizontal = 12.dp),
-        textStyle = TextStyle(fontSize = 14.sp, color = Color.White, textAlign = TextAlign.End),
+        textStyle = TextStyle(fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.End),
         singleLine = true,
         keyboardOptions = KeyboardOptions(
             keyboardType = if (isDecimal) KeyboardType.Decimal else KeyboardType.Number,
@@ -177,7 +178,7 @@ fun CompactNumericInput(
         decorationBox = { innerTextField ->
             Box(contentAlignment = Alignment.CenterEnd) {
                 if (value.isEmpty()) {
-                    Text(placeholder, color = Color.White, textAlign = TextAlign.End, fontSize = 14.sp, maxLines = 1,
+                    Text(placeholder, color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.End, fontSize = 14.sp, maxLines = 1,
                         overflow = TextOverflow.Ellipsis)
                 }
                 innerTextField()

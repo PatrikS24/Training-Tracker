@@ -140,7 +140,7 @@ fun ActiveWorkout(viewModel: WorkoutViewModel, onSearchTriggered: (Exercise?) ->
             }
 
             if (showFinishWorkoutDialog) {
-                AreYouSureDialog("Are you sure you want to finish this workout?") {
+                AreYouSureDialog("Are you sure you want to finish this workout? All unfinished sets will be discarded") {
                     isSure ->
                     if (isSure) {
                         viewModel.finishWorkout()
@@ -179,7 +179,7 @@ fun ActiveWorkout(viewModel: WorkoutViewModel, onSearchTriggered: (Exercise?) ->
                 TextButton(onClick = {
                     showCancelWorkoutDialog = true
                 }) {
-                    Text("Cancel Workout", color = Color.Red)
+                    Text("Cancel Workout", color = MaterialTheme.colorScheme.error)
                 }
 
                 if (showCancelWorkoutDialog) {
