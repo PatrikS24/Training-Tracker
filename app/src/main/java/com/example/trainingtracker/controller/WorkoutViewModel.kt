@@ -22,6 +22,7 @@ class WorkoutViewModel(application: Application) :
     var state : WorkoutScreenState by mutableStateOf(WorkoutScreenState.inactive)
 
     var movements = mutableStateListOf<MovementDB>()
+    var PreviousWorkouts = mutableStateListOf<Workout>()
 
     private val workoutDao = DatabaseProvider
         .getDatabase(application)
@@ -115,6 +116,7 @@ class WorkoutViewModel(application: Application) :
     fun finishWorkout() {
         // Todo: remove unfinished sets from exercises
         //       remove exercises if no sets were completed
+        activeWorkout.updateDuration()
         activeWorkout.completed = true
         setScreenState(WorkoutScreenState.inactive)
         updateDatabase()

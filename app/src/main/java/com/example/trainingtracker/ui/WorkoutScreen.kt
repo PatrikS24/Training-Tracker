@@ -75,7 +75,7 @@ fun WorkoutScreen( viewModel: WorkoutViewModel = viewModel() )
 }
 
 @Composable
-fun NoActiveWorkout(viewModel: WorkoutViewModel = viewModel()) {
+fun NoActiveWorkout(viewModel: WorkoutViewModel) {
     // todo: add workout history
     Column (modifier = Modifier.fillMaxSize().padding(16.dp)){
 
@@ -112,7 +112,7 @@ fun NoActiveWorkout(viewModel: WorkoutViewModel = viewModel()) {
 }
 
 @Composable
-fun ActiveWorkout(viewModel: WorkoutViewModel = viewModel(), onSearchTriggered: (Exercise?) -> Unit) {
+fun ActiveWorkout(viewModel: WorkoutViewModel, onSearchTriggered: (Exercise?) -> Unit) {
     Column (
         modifier = Modifier.fillMaxSize().padding(0.dp),
         horizontalAlignment = Alignment.CenterHorizontally){
@@ -123,7 +123,7 @@ fun ActiveWorkout(viewModel: WorkoutViewModel = viewModel(), onSearchTriggered: 
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ){
-            ClickToEditText(viewModel.activeWorkout.name)
+            ClickToEditText(viewModel.activeWorkout.name, viewModel)
 
             WorkoutDurationDisplay(viewModel.activeWorkout.startTime)
 
@@ -218,7 +218,7 @@ fun WorkoutDurationDisplay(startTime: Date) {
 }
 
 @Composable
-fun ClickToEditText(initialText: String? = "", viewModel: WorkoutViewModel = viewModel()) {
+fun ClickToEditText(initialText: String? = "", viewModel: WorkoutViewModel) {
     var text by remember { mutableStateOf(initialText) }
     var isFocused by remember { mutableStateOf(false) }
 
@@ -261,7 +261,7 @@ fun ClickToEditText(initialText: String? = "", viewModel: WorkoutViewModel = vie
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(viewModel: WorkoutViewModel = viewModel(), exercise: Exercise?, onDismiss: () -> Unit) {
+fun SearchScreen(viewModel: WorkoutViewModel, exercise: Exercise?, onDismiss: () -> Unit) {
     var query by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(true) }
 

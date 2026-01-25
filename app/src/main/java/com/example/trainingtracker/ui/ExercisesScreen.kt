@@ -56,7 +56,7 @@ fun ExercisesScreen( viewModel: MovementViewModel = viewModel() )
 }
 
 @Composable
-fun NewMovementButton(viewModel: MovementViewModel = viewModel(), modifier: Modifier = Modifier) {
+fun NewMovementButton(viewModel: MovementViewModel, modifier: Modifier = Modifier) {
     var dialogData by remember { mutableStateOf(DialogData(-1, false)) }
 
     FloatingActionButton(
@@ -82,7 +82,7 @@ fun NewMovementButton(viewModel: MovementViewModel = viewModel(), modifier: Modi
 
 @Composable
 fun NewMovementDialog(
-    viewModel: MovementViewModel = viewModel(),
+    viewModel: MovementViewModel,
     updateShowAddDialog: (DialogData) -> Unit,
     dialogData: DialogData
 ) {
@@ -145,7 +145,7 @@ fun NewMovementDialog(
 }
 
 @Composable
-fun MovementCard(viewModel: MovementViewModel = viewModel(), movement : Movement) {
+fun MovementCard(viewModel: MovementViewModel, movement : Movement) {
     var dialogData by remember { mutableStateOf(DialogData(1, false)) }
 
     Card(

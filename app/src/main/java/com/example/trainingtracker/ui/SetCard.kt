@@ -48,7 +48,7 @@ import kotlin.text.toInt
 
 @SuppressLint("MutableCollectionMutableState")
 @Composable
-fun SetCard( viewModel: WorkoutViewModel = viewModel(), set: ExerciseSet, exercise: Exercise ) {
+fun SetCard( viewModel: WorkoutViewModel, set: ExerciseSet, exercise: Exercise ) {
 
 
     val previousSet = exercise.previousSets
@@ -98,12 +98,7 @@ fun SetCard( viewModel: WorkoutViewModel = viewModel(), set: ExerciseSet, exerci
                 placeholder = set.weight.toString(),
                 isDecimal = true,
                 onDone = {
-                    try {
-                        viewModel.updateSetReps(set, reps.toInt())
-                    } catch (e: NumberFormatException) { }
-                    try {
-                        viewModel.updateSetWeight(set, weight.toDouble())
-                    } catch (e: NumberFormatException) { }
+                    updateWeightAndReps(viewModel, set, reps, weight)
                 }
             )
 
@@ -113,12 +108,7 @@ fun SetCard( viewModel: WorkoutViewModel = viewModel(), set: ExerciseSet, exerci
                 placeholder = set.reps.toString(),
                 isDecimal = false,
                 onDone = {
-                    try {
-                        viewModel.updateSetReps(set, reps.toInt())
-                    } catch (e: NumberFormatException) { }
-                    try {
-                        viewModel.updateSetWeight(set, weight.toDouble())
-                    } catch (e: NumberFormatException) { }
+                    updateWeightAndReps(viewModel, set, reps, weight)
                 }
             )
 
@@ -128,12 +118,7 @@ fun SetCard( viewModel: WorkoutViewModel = viewModel(), set: ExerciseSet, exerci
                 onCheckedChange = {
                     completed = it
                     viewModel.updateSetCompleted(set, completed)
-                    try {
-                        viewModel.updateSetReps(set, reps.toInt())
-                    } catch (e: NumberFormatException) { }
-                    try {
-                        viewModel.updateSetWeight(set, weight.toDouble())
-                    } catch (e: NumberFormatException) { }
+                    updateWeightAndReps(viewModel, set, reps, weight)
                 }
             )
             }
@@ -198,4 +183,16 @@ fun CompactNumericInput(
             }
         }
     )
+}
+
+
+fun updateWeightAndReps( viewModel: WorkoutViewModel, set: ExerciseSet, reps: String, weight: String) {
+    try {
+        viewModel.updateSetReps(set, reps.toInt())
+        set.reps = reps.toInt()
+    } catch (e: NumberFormatException) { }
+    try {
+        viewModel.updateSetWeight(set, weight.toDouble())
+        set.weight = weight.toDouble()
+    } catch (e: NumberFormatException) { }
 }

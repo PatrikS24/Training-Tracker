@@ -46,6 +46,16 @@ dependencies {
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-common-jvm:2.8.4")
 
+    // Vico
+    // Core chart logic
+    implementation("com.patrykandpatrick.vico:core:1.13.1")
+
+    // Jetpack Compose integration
+    implementation("com.patrykandpatrick.vico:compose:1.13.1")
+
+    // Material theming (recommended)
+    implementation("com.patrykandpatrick.vico:compose-m3:1.13.1")
+
     implementation("androidx.databinding:databinding-adapters:9.0.0")
     implementation("androidx.core:core-ktx:1.17.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")

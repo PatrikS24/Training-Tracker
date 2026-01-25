@@ -34,7 +34,7 @@ import com.example.trainingtracker.controller.WorkoutViewModel
 import com.example.trainingtracker.model.Exercise
 
 @Composable
-fun ExerciseCard( viewModel: WorkoutViewModel = viewModel(), exercise: Exercise, onSearchTriggered: (Exercise?) -> Unit ) {
+fun ExerciseCard( viewModel: WorkoutViewModel, exercise: Exercise, onSearchTriggered: (Exercise?) -> Unit ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -116,7 +116,7 @@ fun ExerciseCard( viewModel: WorkoutViewModel = viewModel(), exercise: Exercise,
 }
 
 @Composable
-fun ExerciseCardOptionsMenu( viewModel: WorkoutViewModel = viewModel(), exercise: Exercise, onSearchTriggered: (Exercise?) -> Unit ) {
+fun ExerciseCardOptionsMenu( viewModel: WorkoutViewModel, exercise: Exercise, onSearchTriggered: (Exercise?) -> Unit ) {
     var expanded by remember { mutableStateOf(false) }
 
     Box {
