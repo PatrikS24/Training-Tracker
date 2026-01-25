@@ -16,6 +16,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -52,7 +53,9 @@ fun ExerciseCard( viewModel: WorkoutViewModel, exercise: Exercise, onSearchTrigg
                     Button(onClick = {
                         viewModel.state = WorkoutScreenState.search
                         onSearchTriggered(exercise)
-                    }) {
+                    },
+                        shape = MaterialTheme.shapes.medium
+                    ) {
                         Text("Choose movement")
                     }
                     TextButton(onClick = {

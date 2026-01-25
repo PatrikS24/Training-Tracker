@@ -128,14 +128,18 @@ fun NewMovementDialog(
                 ) {
                     Button(onClick = {
                         updateShowAddDialog(dialogData.copy(showDialog = false))
-                    }) {
+                    },
+                        shape = MaterialTheme.shapes.medium
+                    ) {
                         Text("Cancel")
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Button(onClick = {
                         updateShowAddDialog(dialogData.copy(showDialog = false))
                         viewModel.addMovement(exerciseName)
-                    }) {
+                    },
+                        shape = MaterialTheme.shapes.medium
+                    ) {
                         Text("Add")
                     }
                 }
@@ -163,7 +167,9 @@ fun MovementCard(viewModel: MovementViewModel, movement : Movement) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 Button(onClick = {
                     dialogData = dialogData.copy(showDialog = true)
-                }) {
+                },
+                    shape = MaterialTheme.shapes.medium
+                ) {
                     Text("Edit")
                 }
             }
@@ -196,7 +202,6 @@ fun editMovementDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(250.dp)
                 .padding(16.dp),
             shape = RoundedCornerShape(16.dp),
         ) {
@@ -255,14 +260,18 @@ fun EditMovementState(
         ) {
             Button(onClick = {
                 updateDialogData(dialogData.copy(showDialog = false))
-            }) {
+            },
+                shape = MaterialTheme.shapes.medium
+            ) {
                 Text("Cancel")
             }
             Spacer(modifier = Modifier.weight(1f))
             Button(onClick = {
                 updateDialogData(dialogData.copy(showDialog = false))
                 viewModel.renameMovement(movement, exerciseName);
-            }) {
+            },
+                shape = MaterialTheme.shapes.medium
+            ) {
                 Text("Confirm")
             }
         }
@@ -289,7 +298,9 @@ fun DeleteMovementState(
         ) {
             Button(onClick = {
                 updateDialogData(dialogData.copy(state = 1, showDialog = false))
-            }) {
+            },
+                shape = MaterialTheme.shapes.medium
+            ) {
                 Text("Cancel")
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -297,6 +308,7 @@ fun DeleteMovementState(
                 updateDialogData(dialogData.copy(state = 1, showDialog = false))
                 viewModel.removeMovement(movement);
             },
+                shape = MaterialTheme.shapes.medium,
                 colors = ButtonDefaults.buttonColors(Color.Red, Color.White)
             ) {
                 Text("Confirm")

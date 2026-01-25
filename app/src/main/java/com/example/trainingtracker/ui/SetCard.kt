@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -158,7 +159,7 @@ fun CompactNumericInput(
         modifier = Modifier
             .width(60.dp)
             .height(30.dp)
-            .background(Color.DarkGray, RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
             .padding(horizontal = 12.dp),
         textStyle = TextStyle(fontSize = 14.sp, color = Color.White, textAlign = TextAlign.End),
         singleLine = true,
