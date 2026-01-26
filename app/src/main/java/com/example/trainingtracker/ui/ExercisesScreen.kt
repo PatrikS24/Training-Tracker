@@ -223,7 +223,7 @@ fun EditMovementState(
     viewModel: MovementViewModel = viewModel(),
     dialogData: DialogData, movement: Movement,
     updateDialogData: (DialogData) -> Unit) {
-    var exerciseName by remember { mutableStateOf("")}
+    var exerciseName by remember { mutableStateOf(movement.name)}
 
     Column(modifier = Modifier.padding(16.dp)) {
         Row (
@@ -232,7 +232,7 @@ fun EditMovementState(
             verticalAlignment = Alignment.CenterVertically
             ) {
             Text(
-                text = "Edit exercise name",
+                text = "Edit",
                 modifier = Modifier
                     .wrapContentSize(Alignment.Center),
                 textAlign = TextAlign.Start,
@@ -250,7 +250,7 @@ fun EditMovementState(
         OutlinedTextField(
             value = exerciseName,
             onValueChange = { newText -> exerciseName = newText },
-            label = { Text(movement.name) },
+            label = { Text("Exercise name") },
             modifier = Modifier.fillMaxWidth()
         )
         Row (

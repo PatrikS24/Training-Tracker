@@ -83,7 +83,7 @@ interface WorkoutDao {
     @Query("UPDATE workouts SET name = :name WHERE id = :id")
     suspend fun updateName(id: Int, name: String)
 
-    @Query("DELETE FROM workouts")    // todo: REMOVE
+    @Query("DELETE FROM workouts")
     suspend fun deleteAll()
 }
 
@@ -276,7 +276,7 @@ object DatabaseProvider {
                 context.applicationContext,
                 TrainingDatabase::class.java,
                 "training_database"
-            ).fallbackToDestructiveMigration().build().also { INSTANCE = it }  // todo: remove ".fallbackToDestructiveMigration()"
+            ).build().also { INSTANCE = it }  // todo: remove ".fallbackToDestructiveMigration()" !!Done!!
         }
     }
 }

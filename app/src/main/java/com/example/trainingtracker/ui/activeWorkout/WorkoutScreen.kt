@@ -102,6 +102,8 @@ fun NoActiveWorkout(viewModel: WorkoutViewModel) {
 
         Spacer(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.07f))
 
+        // Remove all tables button
+        /*
         var showDeleteWorkoutTableDialog by remember { mutableStateOf(false) }
         Button(
             onClick = {
@@ -113,13 +115,16 @@ fun NoActiveWorkout(viewModel: WorkoutViewModel) {
             Text("Delete workout table")
         }
         if (showDeleteWorkoutTableDialog) {
+
             AreYouSureDialog("Are you sure you want to delete all workout tables?") {
                     isSure ->
                 showDeleteWorkoutTableDialog = false
-                if (isSure) {viewModel.deleteAllWorkouts()}
+                if (isSure) { viewModel.deleteAllWorkouts() }
 
             }
         }
+
+         */
     }
 }
 
