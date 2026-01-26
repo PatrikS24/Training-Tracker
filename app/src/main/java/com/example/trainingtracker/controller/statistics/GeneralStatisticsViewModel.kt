@@ -66,7 +66,7 @@ class GeneralStatisticsViewModel(application: Application) : AndroidViewModel(ap
         updateDurationChartState()
         
         // Load actual data from database
-        loadChartData()
+        //loadChartData()
     }
 
     data class WeeklyCount(
@@ -160,12 +160,6 @@ class GeneralStatisticsViewModel(application: Application) : AndroidViewModel(ap
         }
     }
 
-    data class SetWithTime(
-        val date: LocalDate,
-        val weight: Double,
-        val reps: Int,
-        val isWarmup: Boolean
-    )
 
     fun Date.toLocalDate(): LocalDate =
         Instant.ofEpochMilli(time)

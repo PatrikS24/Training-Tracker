@@ -17,6 +17,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -65,7 +66,7 @@ fun SetCard( viewModel: WorkoutViewModel, set: ExerciseSet, exercise: Exercise )
     var reps by remember { mutableStateOf(if (set.reps != 0) set.reps.toString() else "") }
     var completed by remember { mutableStateOf(set.completed) }
 
-    Card(
+    ElevatedCard(
         modifier = Modifier
             .fillMaxSize(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),

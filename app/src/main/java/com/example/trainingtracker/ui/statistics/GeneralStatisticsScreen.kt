@@ -2,10 +2,7 @@ package com.example.trainingtracker.ui.statistics
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -14,7 +11,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,9 +33,7 @@ import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
 import com.patrykandpatrick.vico.core.common.Fill
-import com.patrykandpatrick.vico.core.common.component.TextComponent
 import java.time.temporal.ChronoField
-import java.time.temporal.TemporalField
 import java.time.temporal.WeekFields
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -49,17 +43,20 @@ import kotlin.math.roundToInt
 fun GeneralStatisticsScreen(viewModel: GeneralStatisticsViewModel = viewModel()) {
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(18.dp),
+        modifier = Modifier.fillMaxSize().padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Text("Workouts per week")
-        WorkoutFrequencyChart(viewModel)
+        Text("General Statistics", fontSize = 25.sp)
 
-        Spacer(modifier = Modifier.fillMaxHeight(0.1f))
+        StatisticCard("Workouts per week", modifier = Modifier) {
+            WorkoutFrequencyChart(viewModel)
 
-        Text("Workout duration")
-        WorkoutDurationChart(viewModel)
+        }
+
+        StatisticCard("Workout duration", modifier = Modifier) {
+            WorkoutDurationChart(viewModel)
+        }
     }
 }
 
