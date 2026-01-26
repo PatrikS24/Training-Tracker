@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trainingtracker.controller.DatabaseProvider
 import com.example.trainingtracker.controller.StatisticsRepository
+import com.example.trainingtracker.controller.WorkoutDB
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import kotlinx.coroutines.launch
@@ -24,10 +25,19 @@ class GeneralStatisticsViewModel(application: Application) : AndroidViewModel(ap
         .getDatabase(application)
         .statisticsDao()
     val repository = StatisticsRepository(statisticsDao)
-    val modelProducer = CartesianChartModelProducer()
-    private var weeklyData: List<WeeklyCount> = emptyList()
+    val frequencyModelProducer = CartesianChartModelProducer()
+
+    val durationModelProducer = CartesianChartModelProducer()
+
+    private var weeklyFrequencyData: List<WeeklyCount> = emptyList()
+
+    private var dailyDurationData: List<DailyDuration> = emptyList()
+
 
     var weekLabels by mutableStateOf<List<LocalDate>>(emptyList())
+        private set
+
+    var dayLabels by mutableStateOf<List<LocalDate>>(emptyList())
         private set
 
     init {
@@ -41,19 +51,40 @@ class GeneralStatisticsViewModel(application: Application) : AndroidViewModel(ap
             WeeklyCount(today.minusWeeks(1), 2),
             WeeklyCount(today, 1),
         )
-        weeklyData = fillMissingWeeks(rawDummyData)
-        updateChartState()
+        weeklyFrequencyData = fillMissingWeeks(rawDummyData)
+        updateWorkoutFrequencyChartState()
+
+        val rawDummyDurationData = listOf(
+            DailyDuration(today.minusDays(7), 60),
+            DailyDuration(today.minusDays(4), 73),
+            DailyDuration(today.minusDays(3), 90),
+            DailyDuration(today.minusWeeks(2), 96),
+            DailyDuration(today.minusWeeks(1), 65)
+            )
+
+        dailyDurationData = rawDummyDurationData.sortedBy { it.date }
+        updateDurationChartState()
         
         // Load actual data from database
-        //loadWeeklyData()
+        loadChartData()
     }
+
+    data class WeeklyCount(
+        val weekStart: LocalDate,
+        val count: Int
+    )
+
+    data class DailyDuration(
+        val date: LocalDate,
+        val durationMinutes: Int
+    )
 
     private fun fillMissingWeeks(data: List<WeeklyCount>): List<WeeklyCount> {
         if (data.isEmpty()) return emptyList()
-        
+
         val sortedData = data.sortedBy { it.weekStart }
         val startDate = sortedData.first().weekStart
-        val endDate = sortedData.last().weekStart
+        val endDate = LocalDate.now().startOfWeek()
         
         val result = mutableListOf<WeeklyCount>()
         var currentDate = startDate
@@ -68,15 +99,15 @@ class GeneralStatisticsViewModel(application: Application) : AndroidViewModel(ap
         return result
     }
 
-    private fun updateChartState() {
-        weekLabels = weeklyData.map { it.weekStart }
-        if (weeklyData.isNotEmpty()) {
+    private fun updateWorkoutFrequencyChartState() {
+        weekLabels = weeklyFrequencyData.map { it.weekStart }
+        if (weeklyFrequencyData.isNotEmpty()) {
             viewModelScope.launch {
-                modelProducer.runTransaction {
+                frequencyModelProducer.runTransaction {
                     columnSeries {
                         series(
-                            weeklyData.mapIndexed { index, _ -> index.toFloat() },
-                            weeklyData.map { it.count.toFloat() }
+                            weeklyFrequencyData.mapIndexed { index, _ -> index.toFloat() },
+                            weeklyFrequencyData.map { it.count.toFloat() }
                         )
                     }
                 }
@@ -84,24 +115,56 @@ class GeneralStatisticsViewModel(application: Application) : AndroidViewModel(ap
         }
     }
 
-    fun loadWeeklyData() {
-        viewModelScope.launch {
-            val data = repository.getWorkouts()
-            val frequencyMap = data.groupingBy { it.startTime.toLocalDate().startOfWeek() }.eachCount()
-            val rawSortedData = frequencyMap.map{ WeeklyCount(it.key, it.value) }.sortedBy { it.weekStart }
-            
-            val filledData = fillMissingWeeks(rawSortedData)
-            
-            if (filledData.isNotEmpty()) {
-                weeklyData = filledData
-                updateChartState()
+    private fun updateDurationChartState() {
+        dayLabels = dailyDurationData.map { it.date }
+        if (dailyDurationData.isNotEmpty()) {
+            viewModelScope.launch {
+                durationModelProducer.runTransaction {
+                    columnSeries {
+                        series(
+                            dailyDurationData.mapIndexed { index, _ -> index.toFloat() },
+                            dailyDurationData.map { it.durationMinutes.toFloat() }
+                        )
+                    }
+                }
             }
         }
     }
 
-    data class WeeklyCount(
-        val weekStart: LocalDate,
-        val count: Int
+    fun loadChartData() {
+        viewModelScope.launch {
+            val data = repository.getCompletedWorkouts()
+            loadWorkoutFrequencyData(data)
+            loadWorkoutDurationData(data)
+        }
+    }
+
+    fun loadWorkoutFrequencyData(data: List<WorkoutDB>) {
+        val frequencyMap = data.groupingBy { it.startTime.toLocalDate().startOfWeek() }.eachCount()
+        val rawSortedData = frequencyMap.map{ WeeklyCount(it.key, it.value) }.sortedBy { it.weekStart }
+
+        val filledData = fillMissingWeeks(rawSortedData)
+
+        if (filledData.isNotEmpty()) {
+            weeklyFrequencyData = filledData
+            updateWorkoutFrequencyChartState()
+        }
+    }
+
+    fun loadWorkoutDurationData(data: List<WorkoutDB>) {
+        val rawSortedData = data.map{ DailyDuration(it.startTime.toLocalDate(), it.durationMinutes) }.sortedBy { it.date }
+
+        if (rawSortedData.isNotEmpty()) {
+            dailyDurationData = rawSortedData
+            updateDurationChartState()
+        }
+    }
+
+    data class SetWithTime(
+        val date: LocalDate,
+        val weight: Double,
+        val reps: Int,
+        val isWarmup: Boolean
     )
 
     fun Date.toLocalDate(): LocalDate =

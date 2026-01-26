@@ -3,6 +3,7 @@ package com.example.trainingtracker.controller
 import android.content.Context
 import androidx.room.Dao
 import androidx.room.Database
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -207,10 +208,37 @@ interface ExerciseSetDao {
     suspend fun updateSet(set: ExerciseSetDB)
 }
 
+data class HeaviestSetWithTime(
+    @Embedded val set: ExerciseSetDB,
+    val startTime: Date
+)
+
+
 @Dao
 interface StatisticsDao {
-    @Query("SELECT * FROM workouts")
-    suspend fun getAllWorkouts(): List<WorkoutDB>
+    @Query("SELECT * FROM workouts WHERE completed = 1")
+    suspend fun getAllCompletedWorkouts(): List<WorkoutDB>
+
+    @Query("""
+        SELECT es.*, w.startTime
+        FROM exercise_sets es
+        INNER JOIN exercises e
+            ON es.exerciseId = e.id
+        INNER JOIN workouts w
+            ON e.workoutId = w.id
+        INNER JOIN (
+            SELECT exerciseId, MAX(weight) AS maxWeight
+            FROM exercise_sets
+            GROUP BY exerciseId
+        ) max_sets
+            ON es.exerciseId = max_sets.exerciseId
+           AND es.weight = max_sets.maxWeight
+        WHERE e.movementId = :movementId
+        ORDER BY w.startTime ASC
+    """)
+    suspend fun getHeaviestSetsForMovement(
+        movementId: Int
+    ): List<HeaviestSetWithTime>
 
 }
 
