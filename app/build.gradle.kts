@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.trainingtracker"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -27,12 +27,15 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
+
     buildFeatures {
         compose = true
     }
@@ -41,21 +44,24 @@ android {
 dependencies {
     implementation("androidx.compose.foundation:foundation:1.10.1")
     implementation("androidx.compose.ui:ui-text-google-fonts:1.10.1")
-    val room_version = "2.6.1"
+    val room_version = "2.7.0-alpha11"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
-    implementation("androidx.room:room-common-jvm:2.8.4")
+    implementation("androidx.room:room-common:$room_version")
 
     // Vico
-    // Core chart logic
-    implementation("com.patrykandpatrick.vico:core:1.13.1")
+    val vicoVersion = "2.4.3" // Or the latest stable 2.x version
+
+    // Core logic
+    implementation("com.patrykandpatrick.vico:core:$vicoVersion")
 
     // Jetpack Compose integration
-    implementation("com.patrykandpatrick.vico:compose:1.13.1")
+    implementation("com.patrykandpatrick.vico:compose:$vicoVersion")
 
-    // Material theming (recommended)
-    implementation("com.patrykandpatrick.vico:compose-m3:1.13.1")
+    // For the Cartesian components specifically
+    implementation("com.patrykandpatrick.vico:compose-m3:$vicoVersion")
+
 
     implementation("androidx.databinding:databinding-adapters:9.0.0")
     implementation("androidx.core:core-ktx:1.17.0")
@@ -66,6 +72,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.compose.material:material-icons-core")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")

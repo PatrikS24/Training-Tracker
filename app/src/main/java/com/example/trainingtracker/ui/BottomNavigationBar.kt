@@ -10,6 +10,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
+import com.example.trainingtracker.ui.activeWorkout.WorkoutScreen
+import com.example.trainingtracker.ui.statistics.GeneralStatisticsScreen
+import com.example.trainingtracker.ui.statistics.StatisticsScreen
 
 sealed class BottomNavItem(
     val route: String,
@@ -17,7 +21,7 @@ sealed class BottomNavItem(
 ) {
     object Workout : BottomNavItem("workout", "Workout")
     object Exercises : BottomNavItem("exercises", "Exercises")
-    object Statistics : BottomNavItem("statistics", "Statistics")
+    object Statistics : BottomNavItem("statistics_graph", "Statistics")
 
     companion object {
         val items = listOf(Workout, Exercises, Statistics)
@@ -33,7 +37,19 @@ fun AppNavHost(navController: NavHostController) {
     ) {
         composable("workout") { WorkoutScreen() }
         composable("exercises") { ExercisesScreen() }
-        composable("statistics") { StatisticsScreen() }
+
+        navigation(
+            startDestination = "statistics",
+            route = "statistics_graph"
+        ) {
+            composable("statistics") { StatisticsScreen(
+                onGeneralStatisticsClicked = {navController.navigate("general_statistics")},
+                onMovementStatisticsClicked = {navController.navigate("movement_statistics")}
+            ) }
+            composable("search") {}
+            composable("general_statistics") { GeneralStatisticsScreen() }
+            composable("movement_statistics") {}
+        }
     }
 }
 

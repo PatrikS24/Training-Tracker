@@ -1,4 +1,4 @@
-package com.example.trainingtracker.ui
+package com.example.trainingtracker.ui.activeWorkout
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -39,7 +38,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -47,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.trainingtracker.controller.MovementDB
 import com.example.trainingtracker.controller.WorkoutScreenState
 import com.example.trainingtracker.controller.WorkoutViewModel
 import com.example.trainingtracker.model.Exercise
@@ -69,19 +68,28 @@ fun WorkoutScreen( viewModel: WorkoutViewModel = viewModel() )
             ActiveWorkout(viewModel, onSearchTriggered = { dataFromHome ->
                 initialSearchQuery = dataFromHome})
         }
-        WorkoutScreenState.search -> SearchScreen(viewModel, initialSearchQuery,
+        WorkoutScreenState.search -> SearchScreen(viewModel.movements.toList(),
             onDismiss = {
                 viewModel.setScreenState( WorkoutScreenState.active )
-        })
+            }, onMovementChosen = {
+                result ->
+                initialSearchQuery?.movement = Movement(result.id, result.name)
+                viewModel.updateExercise(initialSearchQuery)
+                initialSearchQuery?.onMovementChosen(viewModel)
+
+                viewModel.setScreenState( WorkoutScreenState.active )
+            }
+        )
     }
 }
 
 @Composable
 fun NoActiveWorkout(viewModel: WorkoutViewModel) {
     // todo: add workout history
-    Column (modifier = Modifier.fillMaxSize().padding(16.dp)){
-
-        Spacer(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.4f))
+    Column (
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.Center
+        ){
 
         Button(onClick = {
             viewModel.createWorkout()
@@ -92,7 +100,7 @@ fun NoActiveWorkout(viewModel: WorkoutViewModel) {
             Text("Start new workout")
         }
 
-        Spacer(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.1f))
+        Spacer(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.07f))
 
         var showDeleteWorkoutTableDialog by remember { mutableStateOf(false) }
         Button(
@@ -157,8 +165,8 @@ fun ActiveWorkout(viewModel: WorkoutViewModel, onSearchTriggered: (Exercise?) ->
         ){
             for (exercise in viewModel.activeWorkout.exercises) {
 
-                ExerciseCard(viewModel, exercise, onSearchTriggered = {
-                    dataFromHome ->
+                ExerciseCard(viewModel, exercise, onSearchTriggered = { dataFromHome ->
+                    viewModel.getAllMovements()
                     onSearchTriggered(dataFromHome)
                 })
             }
@@ -267,7 +275,7 @@ fun ClickToEditText(initialText: String? = "", viewModel: WorkoutViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(viewModel: WorkoutViewModel, exercise: Exercise?, onDismiss: () -> Unit) {
+fun SearchScreen(movements: List<MovementDB>, onDismiss: () -> Unit, onMovementChosen: (MovementDB) -> Unit) {
     var query by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(true) }
 
@@ -276,7 +284,6 @@ fun SearchScreen(viewModel: WorkoutViewModel, exercise: Exercise?, onDismiss: ()
         onDismiss()
     }
 
-    viewModel.getAllMovements()
 
     SearchBar(
         query = query,
@@ -286,7 +293,7 @@ fun SearchScreen(viewModel: WorkoutViewModel, exercise: Exercise?, onDismiss: ()
         onActiveChange = { active = it }
     ) {
         // Everything inside these braces appears ONLY when 'active' is true
-        val filteredResults = viewModel.movements.filter { it.name.contains(query, ignoreCase = true) }
+        val filteredResults = movements.filter { it.name.contains(query, ignoreCase = true) }
 
         if (filteredResults.isEmpty() && query.isNotEmpty()) {
             Text("No results found for '$query'", modifier = Modifier.padding(16.dp))
@@ -300,12 +307,8 @@ fun SearchScreen(viewModel: WorkoutViewModel, exercise: Exercise?, onDismiss: ()
                             .fillMaxWidth()
                             .padding(16.dp)
                             .clickable {
-                                /* Handle selection */
-                                exercise?.movement = Movement(result.id, result.name)
-                                viewModel.updateExercise(exercise)
-                                exercise?.onMovementChosen(viewModel)
                                 active = false
-                                viewModel.setScreenState( WorkoutScreenState.active )
+                                onMovementChosen(result)
                             }
                     )
                 }

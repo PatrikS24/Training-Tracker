@@ -101,6 +101,10 @@ interface WorkoutDao {
             childColumns = ["workoutId"],
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index(value = ["movementId"]),
+        Index(value = ["workoutId"])
     ]
 )
 data class ExerciseDB(
@@ -157,6 +161,9 @@ interface ExerciseDao {
             childColumns = ["exerciseId"],
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index(value = ["exerciseId"])
     ]
 )
 data class ExerciseSetDB(
@@ -200,6 +207,13 @@ interface ExerciseSetDao {
     suspend fun updateSet(set: ExerciseSetDB)
 }
 
+@Dao
+interface StatisticsDao {
+    @Query("SELECT * FROM workouts")
+    suspend fun getAllWorkouts(): List<WorkoutDB>
+
+}
+
 
 
 @Database(
@@ -207,7 +221,7 @@ interface ExerciseSetDao {
                 WorkoutDB::class,
                 ExerciseDB::class,
                 ExerciseSetDB::class],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -216,6 +230,7 @@ abstract class TrainingDatabase : RoomDatabase() {
     abstract fun workoutDao(): WorkoutDao
     abstract fun exerciseDao(): ExerciseDao
     abstract fun exerciseSetDao(): ExerciseSetDao
+    abstract fun statisticsDao(): StatisticsDao
 }
 
 
