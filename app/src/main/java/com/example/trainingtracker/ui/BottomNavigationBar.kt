@@ -7,12 +7,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
 import com.example.trainingtracker.ui.activeWorkout.WorkoutScreen
+import com.example.trainingtracker.ui.generalUi.SearchMovementsScreen
 import com.example.trainingtracker.ui.statistics.GeneralStatisticsScreen
+import com.example.trainingtracker.ui.statistics.MovementStatisticsScreen
 import com.example.trainingtracker.ui.statistics.StatisticsScreen
 
 sealed class BottomNavItem(
@@ -44,11 +48,31 @@ fun AppNavHost(navController: NavHostController) {
         ) {
             composable("statistics") { StatisticsScreen(
                 onGeneralStatisticsClicked = {navController.navigate("general_statistics")},
-                onMovementStatisticsClicked = {navController.navigate("movement_statistics")}
+                onMovementStatisticsClicked = {navController.navigate("search")}
             ) }
-            composable("search") {}
+            composable("search") { SearchMovementsScreen(
+                onDismiss = {
+                    navController.popBackStack()
+                },
+                onMovementChosen = {
+                    movement ->
+                    navController.navigate("movement_statistics/${movement}")
+                }
+            ) }
+
             composable("general_statistics") { GeneralStatisticsScreen() }
-            composable("movement_statistics") {}
+
+            composable(
+                route = "movement_statistics/{movementId}",
+                arguments = listOf(
+                navArgument("movementId") { type = NavType.IntType }
+            )) {
+                backStackEntry ->
+                val movementId = backStackEntry.arguments!!.getInt("movementId")
+                MovementStatisticsScreen(
+                    movementId = movementId
+                )
+            }
         }
     }
 }
