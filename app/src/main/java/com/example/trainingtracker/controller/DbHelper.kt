@@ -219,6 +219,9 @@ interface StatisticsDao {
     @Query("SELECT * FROM workouts WHERE completed = 1")
     suspend fun getAllCompletedWorkouts(): List<WorkoutDB>
 
+    @Query("SELECT name FROM movements WHERE id = :movementId")
+    suspend fun getMovementName(movementId: Int): String
+
     @Query("""
         SELECT es.*, w.startTime
         FROM exercise_sets es
@@ -233,7 +236,7 @@ interface StatisticsDao {
         ) max_sets
             ON es.exerciseId = max_sets.exerciseId
            AND es.weight = max_sets.maxWeight
-        WHERE e.movementId = :movementId
+        WHERE e.movementId = :movementId AND w.completed = 1
         ORDER BY w.startTime ASC
     """)
     suspend fun getHeaviestSetsForMovement(

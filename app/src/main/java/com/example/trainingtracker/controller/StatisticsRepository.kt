@@ -10,4 +10,8 @@ class StatisticsRepository(private val statisticsDao: StatisticsDao) {
     suspend fun getHeaviestSetsForMovement(movementId: Int): List<HeaviestSetWithTime> {
         return statisticsDao.getHeaviestSetsForMovement(movementId)
     }
+
+    suspend fun getMovementName(movementId: Int): String {
+        return statisticsDao.getMovementName(movementId)
+    }
 }

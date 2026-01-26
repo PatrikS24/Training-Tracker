@@ -105,7 +105,6 @@ fun SimpleLineChart(modifier: Modifier) {
         chart = rememberCartesianChart(
             rememberLineCartesianLayer(
                 LineCartesianLayer.LineProvider.series(
-
                         LineCartesianLayer.rememberLine(
                             fill = LineCartesianLayer.LineFill.single(fill(MaterialTheme.colorScheme.primary)),
                             areaFill = LineCartesianLayer.AreaFill.single(

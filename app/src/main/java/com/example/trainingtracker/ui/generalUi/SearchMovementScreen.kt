@@ -10,6 +10,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,7 +26,9 @@ fun SearchMovementsScreen(viewModel: SearchViewModel = viewModel(), onDismiss: (
     var query by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(true) }
 
-    viewModel.loadMovements()
+    LaunchedEffect(Unit) {
+        viewModel.loadMovements()
+    }
 
     BackHandler(enabled = true) {
         // Choose your logic here:
