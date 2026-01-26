@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +43,10 @@ import kotlin.math.roundToInt
 @Composable
 fun GeneralStatisticsScreen(viewModel: GeneralStatisticsViewModel = viewModel()) {
 
+    LaunchedEffect(Unit) {
+        viewModel.loadChartData()
+    }
+
     Column(
         modifier = Modifier.fillMaxSize().padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -62,6 +67,12 @@ fun GeneralStatisticsScreen(viewModel: GeneralStatisticsViewModel = viewModel())
 
 @Composable
 fun WorkoutFrequencyChart(viewModel: GeneralStatisticsViewModel) {
+
+    if (!viewModel.hasWorkoutFrequencyData) {
+        Text("No data available")
+        return
+    }
+
     val weekLabels = viewModel.weekLabels
 
     // Formatter is UI logic, so we 'remember' it here
@@ -128,6 +139,12 @@ fun WorkoutFrequencyChart(viewModel: GeneralStatisticsViewModel) {
 
 @Composable
 fun WorkoutDurationChart(viewModel: GeneralStatisticsViewModel) {
+
+    if (!viewModel.hasWorkoutDurationData) {
+        Text("No data available")
+        return
+    }
+
     val dayLabels = viewModel.dayLabels
 
     // Formatter is UI logic, so we 'remember' it here

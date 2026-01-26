@@ -6,8 +6,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -23,31 +30,50 @@ import com.example.trainingtracker.controller.SearchViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchMovementsScreen(viewModel: SearchViewModel = viewModel(), onDismiss: () -> Unit, onMovementChosen: (Int) -> Unit) {
-    var query by remember { mutableStateOf("") }
-    var active by remember { mutableStateOf(true) }
+    var text by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         viewModel.loadMovements()
     }
 
-    BackHandler(enabled = true) {
-        // Choose your logic here:
-        onDismiss()
-    }
 
 
     SearchBar(
-        query = query,
-        onQueryChange = { query = it },
-        onSearch = { active = false },
-        active = active,
-        onActiveChange = { active = it }
+        modifier = Modifier
+            .padding(top = 8.dp),
+        inputField = {
+            SearchBarDefaults.InputField(
+                query = text,
+                onQueryChange = { text = it },
+                onSearch = { expanded = false },
+                expanded = expanded,
+                onExpandedChange = {
+                    expanded = it
+                },
+                placeholder = { Text("Search movements...") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                trailingIcon = {
+                    if (expanded && text.isNotEmpty()) {
+                        IconButton(onClick = { text = "" }) {
+                            Icon(Icons.Default.Clear, contentDescription = null)
+                        }
+                    }
+                },
+            )
+        },
+        expanded = expanded,
+        onExpandedChange = {
+            expanded = it
+            if (!it) {
+                onDismiss()
+            }},
     ) {
         // Everything inside these braces appears ONLY when 'active' is true
-        val filteredResults = viewModel.movements.filter { it.name.contains(query, ignoreCase = true) }
+        val filteredResults = viewModel.movements.filter { it.name.contains(text, ignoreCase = true) }
 
-        if (filteredResults.isEmpty() && query.isNotEmpty()) {
-            Text("No results found for '$query'", modifier = Modifier.padding(16.dp))
+        if (filteredResults.isEmpty() && text.isNotEmpty()) {
+            Text("No results found for '$text'", modifier = Modifier.padding(16.dp))
         } else {
             LazyColumn {
                 items(filteredResults) { result ->
@@ -58,7 +84,7 @@ fun SearchMovementsScreen(viewModel: SearchViewModel = viewModel(), onDismiss: (
                             .fillMaxWidth()
                             .padding(16.dp)
                             .clickable {
-                                active = false
+                                expanded = false
                                 onMovementChosen(result.id)
                             }
                     )

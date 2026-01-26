@@ -62,6 +62,7 @@ class MovementStatisticsViewModel(application: Application) : AndroidViewModel(a
         val count: Int
     )
 
+    /*
     init {
         val today = LocalDate.now().startOfWeek()
         val rawDummyData = listOf(
@@ -75,6 +76,7 @@ class MovementStatisticsViewModel(application: Application) : AndroidViewModel(a
         weeklyFrequencyData = fillMissingWeeks(rawDummyData)
         updateWorkoutFrequencyChartState()
     }
+     */
 
     fun setMovement(id: Int) {
         movementId = id
@@ -99,12 +101,13 @@ class MovementStatisticsViewModel(application: Application) : AndroidViewModel(a
             val filledData = fillMissingWeeks(rawSortedData)
 
             if (filledData.isNotEmpty()) {
-                //weeklyFrequencyData = filledData
+                weeklyFrequencyData = filledData
                 updateWorkoutFrequencyChartState()
             }
 
             movementName = name
             updateMovementData()
+
         }
     }
 

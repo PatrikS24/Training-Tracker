@@ -33,6 +33,13 @@ class GeneralStatisticsViewModel(application: Application) : AndroidViewModel(ap
 
     private var dailyDurationData: List<DailyDuration> = emptyList()
 
+    var hasWorkoutFrequencyData by mutableStateOf(false)
+        private set
+
+    var hasWorkoutDurationData by mutableStateOf(false)
+        private set
+
+
 
     var weekLabels by mutableStateOf<List<LocalDate>>(emptyList())
         private set
@@ -40,7 +47,9 @@ class GeneralStatisticsViewModel(application: Application) : AndroidViewModel(ap
     var dayLabels by mutableStateOf<List<LocalDate>>(emptyList())
         private set
 
+    /*
     init {
+
         // Initialize with dummy weekly data for immediate preview
         val today = LocalDate.now().startOfWeek()
         val rawDummyData = listOf(
@@ -68,6 +77,7 @@ class GeneralStatisticsViewModel(application: Application) : AndroidViewModel(ap
         // Load actual data from database
         //loadChartData()
     }
+     */
 
     data class WeeklyCount(
         val weekStart: LocalDate,
@@ -111,6 +121,7 @@ class GeneralStatisticsViewModel(application: Application) : AndroidViewModel(ap
                         )
                     }
                 }
+                hasWorkoutFrequencyData = true
             }
         }
     }
@@ -127,6 +138,7 @@ class GeneralStatisticsViewModel(application: Application) : AndroidViewModel(ap
                         )
                     }
                 }
+                hasWorkoutDurationData = true
             }
         }
     }

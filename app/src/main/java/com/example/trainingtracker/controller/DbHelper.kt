@@ -252,7 +252,7 @@ interface StatisticsDao {
                 WorkoutDB::class,
                 ExerciseDB::class,
                 ExerciseSetDB::class],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
