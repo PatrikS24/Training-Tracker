@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trainingtracker.controller.DatabaseProvider
-import com.example.trainingtracker.controller.StatisticsRepository
+import com.example.trainingtracker.controller.statistics.StatisticsRepository
 import com.example.trainingtracker.controller.WorkoutDB
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries

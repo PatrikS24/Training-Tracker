@@ -7,7 +7,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trainingtracker.controller.DatabaseProvider
-import com.example.trainingtracker.controller.StatisticsRepository
+import com.example.trainingtracker.controller.ExerciseSetDB
+import com.example.trainingtracker.controller.statistics.StatisticsRepository
 import com.example.trainingtracker.controller.statistics.GeneralStatisticsViewModel.WeeklyCount
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
@@ -154,6 +155,13 @@ class MovementStatisticsViewModel(application: Application) : AndroidViewModel(a
             }
         }
     }
+
+    fun getBestSet(): DailyMovementData? {
+        if (movementData == null) return null
+
+        return movementData.maxByOrNull { it.weight }
+    }
+
 
     private fun fillMissingWeeks(data: List<WeeklyCount>): List<WeeklyCount> {
         if (data.isEmpty()) return emptyList()

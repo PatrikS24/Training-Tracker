@@ -12,10 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun StatisticCard(title: String, modifier: Modifier, content: @Composable ColumnScope.() -> Unit) {
+fun StatisticCard(title: String, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     ElevatedCard {
         Column(
-            modifier = Modifier.padding(5.dp).fillMaxWidth(),
+            modifier = modifier.padding(5.dp).fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(title)

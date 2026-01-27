@@ -2,7 +2,9 @@ package com.example.trainingtracker.ui.statistics
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -33,7 +35,6 @@ import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.fill
 import com.patrykandpatrick.vico.compose.common.shader.toShaderProvider
 import com.patrykandpatrick.vico.compose.common.shape.toVicoShape
-import com.patrykandpatrick.vico.core.cartesian.CartesianChart
 import com.patrykandpatrick.vico.core.cartesian.Scroll
 import com.patrykandpatrick.vico.core.cartesian.Zoom
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
@@ -58,32 +59,66 @@ fun MovementStatisticsScreen(
         viewModel.setMovement(movementId)
     }
 
-    val scrollState = rememberScrollState()
-
-
     Column(
-        modifier = Modifier.fillMaxSize().padding(10.dp).verticalScroll(scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         viewModel.movementName?.let { Text(it, fontSize = 25.sp) }
 
-        StatisticCard(
-            "Weight",
-            modifier = Modifier
-        ) {
-            MovementLineChart(viewModel, viewModel.byWeightModelProducer, "Kg")
-        }
+        val scrollState = rememberScrollState()
 
-        StatisticCard(
-            "Repetitions",
-            modifier = Modifier
-        ) {
-            MovementLineChart(viewModel, viewModel.byRepsModelProducer, "Reps", 1.0)
-        }
+        if (!viewModel.hasMovementData) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(18.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                StatisticCard(
+                    "No data available for this movement"
+                ) { }
+            }
+        } else {
 
-        StatisticCard("Frequency per week", modifier = Modifier) {
-            MovementFrequencyChart(viewModel)
+            Column(
+                modifier = Modifier.fillMaxSize().padding(10.dp).verticalScroll(scrollState),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+
+                StatisticCard("Personal best", modifier = Modifier) {
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        val best = viewModel.getBestSet()
+                        val date = "${best?.date?.get(ChronoField.DAY_OF_MONTH)}." +
+                                "${best?.date?.get(ChronoField.MONTH_OF_YEAR)}." +
+                                "${best?.date?.get(ChronoField.YEAR).toString().subSequence(2, 4)}"
+                        Text("Date: $date")
+                        Text("Weight: ${best?.weight} Kg")
+                        Text("Reps: ${best?.reps}")
+                    }
+
+                }
+
+                StatisticCard(
+                    "Weight"
+                ) {
+                    MovementLineChart(viewModel, viewModel.byWeightModelProducer, "Kg")
+                }
+
+                StatisticCard(
+                    "Repetitions"
+                ) {
+                    MovementLineChart(viewModel, viewModel.byRepsModelProducer, "Reps", 1.0)
+                }
+
+                StatisticCard("Frequency per week", modifier = Modifier) {
+                    MovementFrequencyChart(viewModel)
+                }
+            }
         }
     }
 }
@@ -96,7 +131,6 @@ fun MovementLineChart(viewModel: MovementStatisticsViewModel,
                       step: Double? = null) {
 
     if (!viewModel.hasMovementData) {
-        Text("No data available for this movement")
         return
     }
 
@@ -179,7 +213,6 @@ fun MovementFrequencyChart(viewModel: MovementStatisticsViewModel) {
     val weekLabels = viewModel.weekLabels
 
     if (!viewModel.hasMovementData) {
-        Text("No data available for this movement")
         return
     }
 

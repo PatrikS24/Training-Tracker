@@ -1,6 +1,8 @@
-package com.example.trainingtracker.controller
+package com.example.trainingtracker.controller.statistics
 
-import com.example.trainingtracker.model.Workout
+import com.example.trainingtracker.controller.HeaviestSetWithTime
+import com.example.trainingtracker.controller.StatisticsDao
+import com.example.trainingtracker.controller.WorkoutDB
 
 class StatisticsRepository(private val statisticsDao: StatisticsDao) {
     suspend fun getCompletedWorkouts(): List<WorkoutDB> {

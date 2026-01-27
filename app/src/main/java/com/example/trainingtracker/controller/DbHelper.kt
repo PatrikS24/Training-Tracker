@@ -224,20 +224,27 @@ interface StatisticsDao {
 
     @Query("""
         SELECT es.*, w.startTime
-        FROM exercise_sets es
-        INNER JOIN exercises e
-            ON es.exerciseId = e.id
-        INNER JOIN workouts w
-            ON e.workoutId = w.id
-        INNER JOIN (
-            SELECT exerciseId, MAX(weight) AS maxWeight
-            FROM exercise_sets
-            GROUP BY exerciseId
-        ) max_sets
-            ON es.exerciseId = max_sets.exerciseId
-           AND es.weight = max_sets.maxWeight
-        WHERE e.movementId = :movementId AND w.completed = 1
-        ORDER BY w.startTime ASC
+    FROM exercise_sets es
+    INNER JOIN exercises e
+        ON es.exerciseId = e.id
+    INNER JOIN workouts w
+        ON e.workoutId = w.id
+    WHERE e.movementId = :movementId
+      AND w.completed = 1
+      AND es.id = (
+          SELECT es2.id
+          FROM exercise_sets es2
+          INNER JOIN exercises e2
+              ON es2.exerciseId = e2.id
+          WHERE e2.workoutId = e.workoutId
+            AND e2.movementId = :movementId
+          ORDER BY 
+              es2.weight DESC,
+              es2.reps DESC,
+              es2.orderIndex ASC
+          LIMIT 1
+      )
+    ORDER BY w.startTime ASC
     """)
     suspend fun getHeaviestSetsForMovement(
         movementId: Int
