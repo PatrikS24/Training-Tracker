@@ -14,6 +14,6 @@ class StatisticsRepository(private val statisticsDao: StatisticsDao) {
     }
 
     suspend fun getMovementName(movementId: Int): String {
-        return statisticsDao.getMovementName(movementId)
+        return statisticsDao.getMovementName(movementId) ?: "Unknown Movement"
     }
 }

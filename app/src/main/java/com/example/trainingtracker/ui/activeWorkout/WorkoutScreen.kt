@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -261,7 +263,7 @@ fun ClickToEditText(initialText: String? = "", viewModel: WorkoutViewModel) {
         BasicTextField(
             value = it1,
             onValueChange = { text = it },
-            modifier = Modifier.onFocusChanged { isFocused = it.isFocused },
+            modifier = Modifier.onFocusChanged { isFocused = it.isFocused }.widthIn(min = 100.dp, max = 150.dp),
             textStyle = style,
             decorationBox = { inner ->
                 if (isFocused) {
@@ -312,7 +314,8 @@ fun SearchScreen(movements: List<MovementDB>, onDismiss: () -> Unit, onMovementC
         if (filteredResults.isEmpty() && query.isNotEmpty()) {
             Text("No results found for '$query'", modifier = Modifier.padding(16.dp))
         } else {
-            LazyColumn {
+            val listState = rememberLazyListState()
+            LazyColumn (state = listState) {
                 items(filteredResults) { result ->
                     // What each search result looks like
                     Text(

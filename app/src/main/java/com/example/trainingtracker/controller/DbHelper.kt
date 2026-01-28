@@ -47,7 +47,7 @@ interface MovementDao {
     suspend fun updateName(id: Int, name: String)
 
     @Query("SELECT * FROM movements WHERE id = :id LIMIT 1")
-    suspend fun getMovementById(id: Int?) : MovementDB
+    suspend fun getMovementById(id: Int?) : MovementDB?
 
 }
 
@@ -223,7 +223,7 @@ interface StatisticsDao {
     suspend fun getAllCompletedWorkouts(): List<WorkoutDB>
 
     @Query("SELECT name FROM movements WHERE id = :movementId")
-    suspend fun getMovementName(movementId: Int): String
+    suspend fun getMovementName(movementId: Int): String?
 
     @Query("""
         SELECT es.*, w.startTime

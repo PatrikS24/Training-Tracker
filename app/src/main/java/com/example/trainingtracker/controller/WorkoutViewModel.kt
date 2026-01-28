@@ -198,11 +198,9 @@ class WorkoutViewModel(application: Application) :
                 for (dbExercise in dbExercises) {
                     val exercise = Exercise(id = dbExercise.id)
                     val dbMovement = movementDao.getMovementById(dbExercise.movementId)
-                    try {
-                        exercise.movement = Movement(id = dbMovement.id, name = dbMovement.name)
-                    } catch (e: NullPointerException) {
-                        exercise.movement = null
-                    }
+                    
+                    exercise.movement = dbMovement?.let { Movement(id = it.id, name = it.name) }
+
                     exercise.orderIndex = dbExercise.orderIndex
                     exercise.notes = dbExercise.notes
 

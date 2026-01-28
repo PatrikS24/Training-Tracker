@@ -6,6 +6,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -103,14 +104,17 @@ fun AppNavHost(navController: NavHostController) {
 @Composable
 fun BottomBar(navController: NavController) {
 
-    val currentRoute = navController
-        .currentBackStackEntryAsState()
-        .value?.destination?.route
+    val navBackStackEntry =
+        navController.currentBackStackEntryAsState().value
+
+    val currentDestination = navBackStackEntry?.destination
 
     NavigationBar {
         BottomNavItem.items.forEach { item ->
 
-            val selected = currentRoute == item.route
+            val selected = currentDestination
+                ?.hierarchy
+                ?.any { it.route == item.route } == true
 
             NavigationBarItem(
                 selected = selected,
@@ -123,8 +127,6 @@ fun BottomBar(navController: NavController) {
                         restoreState = true
                     }
                 },
-
-                // Text-only bottom bar
                 icon = {
                     Text(
                         text = item.label,
@@ -134,8 +136,6 @@ fun BottomBar(navController: NavController) {
                             MaterialTheme.typography.labelMedium
                     )
                 },
-
-                // Disable label to avoid duplication
                 label = null
             )
         }

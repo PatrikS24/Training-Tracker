@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -96,20 +97,27 @@ fun WorkoutCard(workout: Workout, onEdit: (Workout) -> Unit, onDelete: () -> Uni
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.End
             ) {
-                WorkoutEditMenu(
-                    onEdit = {
-                        onEdit(workout)
-                    },
-                    onDelete = {
-                        showDeleteWorkoutDialog = true
-                    }
-                )
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Text(workout.name, modifier = Modifier.widthIn(min = 100.dp, max = 150.dp))
+
+                    WorkoutEditMenu(
+                        onEdit = {
+                            onEdit(workout)
+                        },
+                        onDelete = {
+                            showDeleteWorkoutDialog = true
+                        }
+                    )
+                }
                 Row (
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ){
-                    Text(workout.name)
                     Text("${workout.durationMinutes / 60}h ${workout.durationMinutes % 60}min")
                     val date = workout.startTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
                     val dateString = "${date.dayOfMonth}." +
