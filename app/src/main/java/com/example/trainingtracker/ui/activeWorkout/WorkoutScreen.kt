@@ -2,6 +2,7 @@ package com.example.trainingtracker.ui.activeWorkout
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -130,8 +131,16 @@ fun NoActiveWorkout(viewModel: WorkoutViewModel) {
 
 @Composable
 fun ActiveWorkout(viewModel: WorkoutViewModel, onSearchTriggered: (Exercise?) -> Unit) {
+    val focusManager = LocalFocusManager.current
+
     Column (
-        modifier = Modifier.fillMaxSize().padding(0.dp),
+        modifier = Modifier.fillMaxSize().padding(0.dp).clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+            onClick = {
+                focusManager.clearFocus()
+            }
+        ),
         horizontalAlignment = Alignment.CenterHorizontally){
 
         // Top bar
@@ -166,7 +175,7 @@ fun ActiveWorkout(viewModel: WorkoutViewModel, onSearchTriggered: (Exercise?) ->
         val scrollState = rememberScrollState()
 
         Column (
-            modifier = Modifier.weight(1f).verticalScroll(scrollState)
+            modifier = Modifier.weight(1f).verticalScroll(scrollState, reverseScrolling = true)
         ){
             for (exercise in viewModel.activeWorkout.exercises) {
 

@@ -3,6 +3,7 @@ package com.example.trainingtracker.controller
 import android.content.Context
 import androidx.room.Dao
 import androidx.room.Database
+import androidx.room.Delete
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -11,11 +12,13 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Relation
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.Update
+import androidx.room.Transaction
 import java.util.Date
 
 @Entity(
@@ -252,6 +255,50 @@ interface StatisticsDao {
 
 }
 
+data class ExerciseWithSetsAndMovement(
+    @Embedded val exercise: ExerciseDB,
+
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "exerciseId"
+    )
+    val sets: List<ExerciseSetDB>,
+
+    @Relation(
+        entity = MovementDB::class,
+        parentColumn = "movementId",
+        entityColumn = "id"
+    )
+    val movement: MovementDB?
+)
+
+
+data class WorkoutWithExercisesAndMovements(
+    @Embedded val workout: WorkoutDB,
+
+    @Relation(
+        entity = ExerciseDB::class,
+        parentColumn = "id",
+        entityColumn = "workoutId"
+    )
+    val exercises: List<ExerciseWithSetsAndMovement>
+)
+
+@Dao
+interface HistoryDao {
+
+    @Transaction
+    @Query("""
+        SELECT * 
+        FROM workouts
+        WHERE completed = 1
+        ORDER BY startTime DESC
+    """)
+    suspend fun getWorkoutHistory(): List<WorkoutWithExercisesAndMovements>
+
+    @Query("DELETE FROM workouts WHERE id = :id")
+    suspend fun deleteWorkoutById(id: Int)
+}
 
 
 @Database(
@@ -269,6 +316,7 @@ abstract class TrainingDatabase : RoomDatabase() {
     abstract fun exerciseDao(): ExerciseDao
     abstract fun exerciseSetDao(): ExerciseSetDao
     abstract fun statisticsDao(): StatisticsDao
+    abstract fun historyDao(): HistoryDao
 }
 
 

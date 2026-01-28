@@ -2,11 +2,15 @@ package com.example.trainingtracker.ui.activeWorkout
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,12 +25,15 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
@@ -74,8 +81,8 @@ fun SetCard( viewModel: WorkoutViewModel, set: ExerciseSet, exercise: Exercise )
     ) {
         Row (
             modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp),
+                .fillMaxSize()
+                .padding(8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
             ){
@@ -93,7 +100,7 @@ fun SetCard( viewModel: WorkoutViewModel, set: ExerciseSet, exercise: Exercise )
                 onValueChange = {weight = it},
                 placeholder = set.weight.toString(),
                 isDecimal = true,
-                onDone = {
+                onKeyboardHidden = {
                     updateWeightAndReps(viewModel, set, reps, weight)
                 }
             )
@@ -103,13 +110,15 @@ fun SetCard( viewModel: WorkoutViewModel, set: ExerciseSet, exercise: Exercise )
                 onValueChange = {reps = it},
                 placeholder = set.reps.toString(),
                 isDecimal = false,
-                onDone = {
+                onKeyboardHidden = {
                     updateWeightAndReps(viewModel, set, reps, weight)
                 }
             )
 
             Checkbox(
-                modifier = Modifier.padding(0.dp).size(16.dp),
+                modifier = Modifier
+                    .padding(0.dp)
+                    .size(16.dp),
                 checked = completed,
                 onCheckedChange = {
                     completed = it
@@ -129,14 +138,16 @@ fun CompactNumericInput(
     onValueChange: (String) -> Unit,
     placeholder: String,
     isDecimal: Boolean = false, // Toggle between Natural and Decimal
-    onDone: () -> Unit
+    onKeyboardHidden: () -> Unit
 ) {
-    // Regex logic:
-    // Natural: Digits only
-    // Decimal: Digits and one optional dot
+    val focusManager = LocalFocusManager.current
+    var isFocused by remember { mutableStateOf(false) }
+    val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+    LaunchedEffect(imeVisible, isFocused) {
+        if (!imeVisible && isFocused) { onKeyboardHidden() }
+    }
 
     val keyboardController = LocalSoftwareKeyboardController.current
-    val focusManager = LocalFocusManager.current
 
 
     val pattern = remember(isDecimal) {
@@ -156,19 +167,16 @@ fun CompactNumericInput(
             .width(60.dp)
             .height(30.dp)
             .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
-            .padding(horizontal = 12.dp),
+            .padding(horizontal = 12.dp)
+            .onFocusChanged {
+                isFocused = it.isFocused
+                onKeyboardHidden()
+            },
         textStyle = TextStyle(fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.End),
         singleLine = true,
         keyboardOptions = KeyboardOptions(
             keyboardType = if (isDecimal) KeyboardType.Decimal else KeyboardType.Number,
             imeAction = ImeAction.Done
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = {
-                onDone()
-                keyboardController?.hide()
-                focusManager.clearFocus()
-            },
         ),
         decorationBox = { innerTextField ->
             Box(contentAlignment = Alignment.CenterEnd) {

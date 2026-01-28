@@ -15,6 +15,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import com.example.trainingtracker.ui.activeWorkout.WorkoutScreen
 import com.example.trainingtracker.ui.generalUi.SearchMovementsScreen
+import com.example.trainingtracker.ui.history.HistoryScreen
 import com.example.trainingtracker.ui.statistics.GeneralStatisticsScreen
 import com.example.trainingtracker.ui.statistics.MovementStatisticsScreen
 import com.example.trainingtracker.ui.statistics.StatisticsScreen
@@ -26,9 +27,10 @@ sealed class BottomNavItem(
     object Workout : BottomNavItem("workout", "Workout")
     object Exercises : BottomNavItem("exercises", "Exercises")
     object Statistics : BottomNavItem("statistics_graph", "Statistics")
+    object History : BottomNavItem("history_graph", "History")
 
     companion object {
-        val items = listOf(Workout, Exercises, Statistics)
+        val items = listOf(Workout, Exercises, Statistics, History)
     }
 }
 
@@ -73,6 +75,27 @@ fun AppNavHost(navController: NavHostController) {
                     movementId = movementId
                 )
             }
+        }
+
+        navigation(
+            startDestination = "history",
+            route = "history_graph"
+        ) {
+            composable(route = "history") {
+                HistoryScreen(onEdit = {
+                    navController.navigate("edit_workout")
+                })
+            }
+
+            composable(
+                route = "edit_workout/{workoutId}",
+                arguments = listOf(
+                    navArgument("workoutId") { type = NavType.IntType }
+                )) {
+                    backStackEntry ->
+                    val workoutId = backStackEntry.arguments!!.getInt("workoutId")
+                    // edit workout screen
+                }
         }
     }
 }
