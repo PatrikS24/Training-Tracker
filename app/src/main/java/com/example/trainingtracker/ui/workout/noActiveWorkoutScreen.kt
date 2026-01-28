@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.trainingtracker.controller.noActiveWorkoutViewModel
-import com.example.trainingtracker.ui.generalUi.AreYouSureDialog
+import com.example.trainingtracker.ui.generalUi.ConfirmDialog
 
 @Composable
 fun NoActiveWorkoutScreen(viewModel: noActiveWorkoutViewModel = viewModel(), onWorkoutStarted: () -> Unit) {
@@ -52,12 +52,12 @@ fun NoActiveWorkoutScreen(viewModel: noActiveWorkoutViewModel = viewModel(), onW
             Text("Delete workout table")
         }
         if (showDeleteWorkoutTableDialog) {
-            AreYouSureDialog("Are you sure you want to delete all workout tables?") {
-                    isSure ->
-                showDeleteWorkoutTableDialog = false
-                if (isSure) {viewModel.deleteAllWorkouts()}
-
-            }
+            ConfirmDialog("Are you sure you want to delete all workout tables?",
+                onIsSure = {
+                        isSure ->
+                    showDeleteWorkoutTableDialog = false
+                    if (isSure) {viewModel.deleteAllWorkouts()}
+                }) {}
         }
     }
 }

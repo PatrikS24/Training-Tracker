@@ -1,6 +1,8 @@
 package com.example.trainingtracker.ui.generalUi
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,14 +20,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import kotlin.Unit
 
 @Composable
-fun AreYouSureDialog(question: String, onIsSure: (Boolean) -> Unit) {
+fun ConfirmDialog(
+    text: String,
+    negativeAnswer: String = "Cancel",
+    positiveAnswer: String = "Confirm",
+    onIsSure: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit
+) {
+
     Dialog(
         onDismissRequest = { onIsSure(false) }, // Dismiss when clicking outside
         properties = DialogProperties(
             dismissOnBackPress = true,
-            dismissOnClickOutside = true)
+            dismissOnClickOutside = true,)
     ) {
         Card(
             modifier = Modifier
@@ -36,26 +47,32 @@ fun AreYouSureDialog(question: String, onIsSure: (Boolean) -> Unit) {
         ) {
             Column (
                 modifier = Modifier.padding(16.dp).fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
             ){
 
-                Text(question, modifier = Modifier.weight(2.5f))
+                Text(text)
 
-                Row (modifier = Modifier.weight(1f)){
+                Column (content = content)
+
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
                     Button(onClick = {
                         onIsSure(false)
                     },
                         shape = MaterialTheme.shapes.medium
                     ) {
-                        Text("Cancel")
+                        Text(negativeAnswer)
                     }
-                    Spacer(modifier = Modifier.size(40.dp))
+
                     Button(onClick = {
                         onIsSure(true)
                     },
                         shape = MaterialTheme.shapes.medium
                     ) {
-                        Text("Yes")
+                        Text(positiveAnswer)
                     }
                 }
             }

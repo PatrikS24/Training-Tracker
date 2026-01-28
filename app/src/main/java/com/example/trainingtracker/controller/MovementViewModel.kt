@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 
 class MovementViewModel(application: Application) :
     AndroidViewModel(application) {
+
     var movements = mutableStateListOf<Movement>();
 
     private val dao = DatabaseProvider
@@ -47,7 +48,7 @@ class MovementViewModel(application: Application) :
 
     }
 
-    fun addMovement(name: String) {
+    fun createMovement(name: String) {
         viewModelScope.launch {
             val movement = MovementDB(name = name)
             dao.insert(movement)
@@ -55,10 +56,10 @@ class MovementViewModel(application: Application) :
         }
     }
 
-    fun removeMovement(movement: Movement) {
+    fun deleteMovement(movement: Movement) {
         viewModelScope.launch {
             dao.deleteById(movement.id)
-            refreshMovements()
+            movements.remove(movement)
         }
     }
 }

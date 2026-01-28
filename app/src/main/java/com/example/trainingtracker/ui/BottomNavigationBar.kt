@@ -1,10 +1,15 @@
 package com.example.trainingtracker.ui
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
@@ -109,7 +114,10 @@ fun BottomBar(navController: NavController) {
 
     val currentDestination = navBackStackEntry?.destination
 
-    NavigationBar {
+    NavigationBar (
+        modifier = Modifier.padding(0.dp).fillMaxWidth()
+
+    ) {
         BottomNavItem.items.forEach { item ->
 
             val selected = currentDestination
@@ -130,6 +138,7 @@ fun BottomBar(navController: NavController) {
                 icon = {
                     Text(
                         text = item.label,
+                        //fontSize = 10.sp,
                         style = if (selected)
                             MaterialTheme.typography.labelLarge
                         else
